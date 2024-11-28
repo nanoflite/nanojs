@@ -1,8 +1,10 @@
 const proto = Object.getPrototypeOf
 const objProto = proto({})
-const funProto = proto(proto)
+const funProto = proto(function() {})
+const asyncProto = proto(async function() {})
+
 const isObj = _ => proto(_ ?? 0) === objProto
-const isFun = _ => proto(_ ?? 0) === funProto
+const isFun = _ => [funProto, asyncProto].includes(proto(_ ?? 0))
 const isNode = _ => !!(_?.nodeType ?? 0)
 const isState = _ => !!(_?.isState ?? false)
 
@@ -22,9 +24,15 @@ const add = (dom, ...children) => {
         if (isState(child)) {
             const node = document.createTextNode('')
             bind(child, () => {
-                schedule(_ => {
-                    node.textContent = child.value
-                })
+                node.textContent = child.value
+            })
+            dom.appendChild(node)
+        } else
+        if (isFun(child)) {
+            const node = document.createTextNode('')
+            const derived = derive(child)
+            bind(derived, () => {
+                node.textContent = child()
             })
             dom.appendChild(node)
         } else {
@@ -47,7 +55,15 @@ const tags = new Proxy(
                         elt.addEventListener(prop.slice(2).toLowerCase(), value)
                     } else
                     if (isFun(value)) {
-                        elt.setAttribute(prop, value())
+                        const derived = derive(value)
+                        bind(derived, () => {
+                            elt.setAttribute(prop, value())
+                        })
+                    } else
+                    if (isState(value)) {
+                        bind (value, () => {
+                            elt.setAttribute(prop, value.value)
+                        })
                     } else {
                         elt.setAttribute(prop, value)
                     }
@@ -108,7 +124,7 @@ function derive(fn) {
 
 const bind = (state, fn) => {
     state.listeners.add(fn)
-    fn(state.value)
+    schedule( _ => fn(state.value))
 }
 
 export { tags, add, schedule, state, derive, bind }
