@@ -1,3 +1,11 @@
+/* n - nanoJS
+ * Minimal reactive framework, batteries included
+ *   - dom manipulation
+ *   - reactive state
+ *   - router
+ *   - model
+ */
+
 const proto = Object.getPrototypeOf
 const objProto = proto({})
 const funProto = proto(function() {})
@@ -46,7 +54,6 @@ const tags = new Proxy(
     {},
     {
         get(target, tag) {
-            console.log(target, tag)
             return (...args) => {
                 const [props, ...children] = isObj(args[0]) ? args : [{}, ...args]
                 const elt = document.createElement(tag)
@@ -109,7 +116,6 @@ function derive(fn) {
     try {
         fn()
         for(const d of derives) {
-            console.log(`Got derive`, d)
             d.listeners.add(() => {
                 derived.value = fn()
             })
@@ -127,4 +133,23 @@ const bind = (state, fn) => {
     schedule( _ => fn(state.value))
 }
 
-export { tags, add, schedule, state, derive, bind }
+const router = (routes, root) => {
+    const parts = hash => hash.match(/[^:/]+/g)
+    const navigate = (hash) => {
+        const hparts = parts(hash)
+        const [ route, component ] = routes.find(([h]) => parts(h)[0] === hparts[0]) ?? []
+        if (!route) return
+        const rparts = parts(route)
+        const args = Object.fromEntries(rparts.slice(1).map((v, i) => [v, hparts[i + 1]]))
+        const parent = root ?? document.body
+        parent.replaceChildren(component(args))
+    }
+    window.addEventListener('hashchange', e => {
+        navigate(window.location.hash)
+    })
+    navigate(routes[0][0])
+}
+
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+export { tags, add, schedule, state, derive, bind, router, sleep }

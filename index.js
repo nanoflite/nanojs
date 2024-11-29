@@ -1,14 +1,38 @@
-import { tags, add, schedule, state, bind, derive } from './n.js'
+import { tags, state, derive, router, sleep } from './n.js'
 
-const { h1, h2, div, button, input, sup, hr, span } = tags
+const { h1, h2, div, button, input, sup, hr, span, a } = tags
+
 
 const counter = state(0)
 const square = derive(_ => counter.value * counter.value)
 
 derive(() => console.log("Counter: ", counter.value))
 
+const menu = [ '#home', '#example', '#derived-state', '#timer/5' ]
+
+const Menu = (menu) => {
+    return div(
+        hr(),
+        menu.flatMap(path => [ a({href: path}, path.slice(1).split('/')[0]), span(' | ') ]).slice(0, -1),
+        hr()
+    )
+}
+
+const Header = (page) => div(
+    h1("n, a nano size reactive framework."),
+    Menu(menu),
+    h2(page)
+)
+
+const Home = () => div(
+    Header('home'),
+    div(
+        `Welcome to n.js! A minimal reactive framework for building web apps.`
+    )
+)
+
 const App = () => div(
-    h1('n, a nano size reactive framework.'),
+    Header('example'),
     div({ style: "background-color: grey; color: white; padding: 10px; border-radius: 10px;"},
         h2('state'),
         div("counter: ", counter),
@@ -29,39 +53,40 @@ const App = () => div(
 
 )
 
-add(document.body, App())
-
 const DerivedState = () => {
     const text = state("n, nanoJS")
     const length = derive(() => text.value.length)
-    return span(
-        "The length of ",
-        input({type: "text", value: text, oninput: e => text.value = e.target.value}),
-        " is ", length, ".",
+    return div(
+        Header('derived state'),
+        span(
+            "The length of ",
+            input({type: "text", value: text, oninput: e => text.value = e.target.value}),
+            " is ", length, ".",
+        )
     )
 }
-
-add(document.body, DerivedState())
-
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 const Timer = ({totalSecs}) => {
     const secs = state(totalSecs)
     return div(
-        span(
-        secs, "s ",
+        Header('async example'),
+        span(' rocket launch in:', secs, "s ",
         button({onclick: async () => {
                 while (secs.value > 0) {
                     await sleep(1000)
                     --secs.value
                 }
                 await sleep(10) // Wait briefly for DOM update
-                alert("⏰: Time is up")
+                alert("Launch 🚀")
                 secs.value = totalSecs
             }}, "Start")
         )
     )
 }
 
-add(document.body, Timer({totalSecs: 5}))
-
+router([
+    ['#home', Home],
+    ['#example', App],
+    ['#derived-state', DerivedState],
+    ['#timer/:totalSecs', Timer]
+])
