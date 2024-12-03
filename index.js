@@ -1,6 +1,6 @@
-import { tags, state, derive, router, sleep } from './n.js'
+import { tags, state, derive, router, sleep, add } from './n.js'
 
-const { h1, h2, div, button, input, sup, hr, span, a } = tags
+const { h1, h2, div, button, input, sup, hr, span, a, li, ul } = tags
 
 
 const counter = state(0)
@@ -8,7 +8,7 @@ const square = derive(_ => counter.value * counter.value)
 
 derive(() => console.log("Counter: ", counter.value))
 
-const menu = [ '#home', '#example', '#derived-state', '#timer/5' ]
+const menu = [ '#home', '#example', '#derived-state', '#timer/5', "#listdemo", "#test" ]
 
 const Menu = (menu) => {
     return div(
@@ -48,9 +48,7 @@ const App = () => div(
         button({ onclick: () => counter.value++ }, 'inc'),
         button({ onclick: () => counter.value-- }, 'dec'),
         button({ onclick: () => counter.value = 0 }, 'reset')
-    ),
-
-
+    )
 )
 
 const DerivedState = () => {
@@ -84,9 +82,70 @@ const Timer = ({totalSecs}) => {
     )
 }
 
+const ListDemo = () => {
+
+    const item = ({text}) => {
+        const deleted = state(false)
+        return () => deleted.value
+                                    ? null
+                                    : li(text, a({onclick: () => deleted.value = true}, "❌"))
+    }
+
+    const list = ul()
+    const text = input({type: "text"})
+    return div(
+        Header('todo'),
+        div(
+        "add item: ",
+        text,
+        " ",
+        button(
+            {
+                onclick: () => {
+                    const todo = item({text: text.value})
+                    console.log(todo)
+                    return add(list, todo)
+                }
+            },
+            "➕"),
+        list
+        )
+    )
+}
+
+const Test = () => {
+    const item = (text) => {
+        const deleted = state(false)
+        return () => deleted.value
+            ? null
+            : li(text, a({onclick: () => deleted.value = true}, "❌"))
+    }
+    const list = ul()
+    return div(
+        Header('test'),
+        div(
+            ul(
+                item('A'),
+                item('B'),
+                item('C'),
+                item('D'),
+                item('E'),
+                item('F'),
+                item('G'),
+                item('H'),
+                item('I'),
+                item('J'),
+                item('K')
+            )
+        )
+    )
+}
+
 router([
     ['#home', Home],
     ['#example', App],
     ['#derived-state', DerivedState],
-    ['#timer/:totalSecs', Timer]
+    ['#timer/:totalSecs', Timer],
+    ['#listdemo', ListDemo],
+    ['#test', Test]
 ])
