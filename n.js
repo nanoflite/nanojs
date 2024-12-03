@@ -3,7 +3,35 @@
  *   - dom manipulation
  *   - reactive state
  *   - router
+ *
+ * TODO:
  *   - model
+ *   - remove dom element when bind returns false (derive also?)
+ *   - NO: web component
+ *
+ */
+
+
+
+
+/*
+    const m = model({
+        name: "",
+        list: [],
+        sub: {
+            a: 1,
+            b: 2
+        }
+    })
+    m.name.value = 'test'
+    derive(() => console.log(`My new name is: ${m.name.value}`))
+    derive(() => console.log(`added: ${m.list[list.length-1].value}`))
+
+    Use:
+        Proxy
+        Reflect
+
+
  */
 
 const proto = Object.getPrototypeOf
@@ -151,5 +179,9 @@ const router = (routes, root) => {
 }
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+const model = () => {
+
+}
 
 export { tags, add, schedule, state, derive, bind, router, sleep }
