@@ -1,13 +1,4 @@
-/* n - nanoJS
- * Minimal reactive framework, batteries included
- *   - dom manipulation
- *   - reactive state
- *   - router
- *
- * TODO:
- *   - component
- *
- */
+// tags, add, router, sleep
 
 import { watch } from './s.mjs'
 
@@ -64,34 +55,34 @@ function add(dom, ...children)  {
     return dom
 }
 
-const tags = new Proxy(
-    {},
-    {
-        get(target, tag) {
-            return (...args) => {
-                const [props, ...children] = (isObj(args[0]) && !isState(args[0])) ? args : [{}, ...args]
-                const elt = document.createElement(tag)
-                for (let [prop, value] of Object.entries(props)) {
-                    if (isFun(value) && prop.startsWith('on')) {
-                        elt.addEventListener(prop.slice(2).toLowerCase(), value)
-                    } else
-                    if (isFun(value)) {
-                        watch(() => {
-                            elt.setAttribute(prop, value())
-                        })
-                    } else
-                    if (isState(value)) {
-                        watch(() => {
-                            elt.setAttribute(prop, value.value)
-                        })
-                    } else {
-                        elt.setAttribute(prop, value)
+function tags(namespace) {
+    return new Proxy(
+        {},
+        {
+            get(target, tag) {
+                return (...args) => {
+                    const [props, ...children] = (isObj(args[0]) && !isState(args[0])) ? args : [{}, ...args]
+                    const elt = namespace ? document.createElementNS(namespace, tag) : document.createElement(tag)
+                    for (let [prop, value] of Object.entries(props)) {
+                        if (isFun(value) && prop.startsWith('on')) {
+                            elt.addEventListener(prop.slice(2).toLowerCase(), value)
+                        } else if (isFun(value)) {
+                            watch(() => {
+                                elt.setAttribute(prop, value())
+                            })
+                        } else if (isState(value)) {
+                            watch(() => {
+                                elt.setAttribute(prop, value.value)
+                            })
+                        } else {
+                            elt.setAttribute(prop, value)
+                        }
                     }
+                    return add(elt, children)
                 }
-                return add(elt, children)
             }
-        }
-    })
+        })
+}
 
 function router(routes, root, notfound) {
     notfound ??= _ => '404: not found'
