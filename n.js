@@ -5,7 +5,6 @@
  *   - router
  *
  * TODO:
- *   - remove dom element when bind returns false (derive also?)
  *   - component
  *
  */
