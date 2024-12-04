@@ -6,6 +6,8 @@ const queuedDerives = new Set()
 let activeDependingSet = null
 let activeDepending = null
 
+const schedule = f => Promise.resolve().then(f)
+
 function state(initialValue) {
     return new Proxy(
        {
@@ -118,7 +120,7 @@ function updateDepending(state) {
             queuedDerives.add(derive)
         }
     }
-    Promise.resolve().then(() => {
+    schedule(() => {
         for (const derive of queuedDerives) {
             derive()
         }
@@ -134,4 +136,4 @@ function derive(fn) {
     return derived
 }
 
-export { state, watch, derive, model }
+export { state, watch, derive, model, schedule }
