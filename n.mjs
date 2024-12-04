@@ -23,12 +23,13 @@ const isState = _ => !!(_?.__isState ?? false)
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
-const getDom = (elt) =>
-    isNode(elt)
+function getDom(elt) {
+    return isNode(elt)
         ? elt
         : isFun(elt)
             ? getDom(elt())
             : new Text(elt)
+}
 
 function add(dom, ...children)  {
 
@@ -92,7 +93,7 @@ const tags = new Proxy(
         }
     })
 
-const router = (routes, root, notfound) => {
+function router(routes, root, notfound) {
     notfound ??= _ => '404: not found'
     const parts = hash => hash.match(/[^:/]+/g)
     const navigate = (hash) => {
