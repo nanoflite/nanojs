@@ -1,4 +1,5 @@
-import { tags, state, derive, router, sleep, add } from './n.js'
+import { state, derive } from './s.mjs'
+import { tags, router, sleep, add } from './n.js'
 
 const { h1, h2, div, button, input, sup, hr, span, a, li, ul } = tags
 

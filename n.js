@@ -5,34 +5,12 @@
  *   - router
  *
  * TODO:
- *   - model
  *   - remove dom element when bind returns false (derive also?)
- *   - NO: web component
+ *   - component
  *
  */
 
-
-
-
-/*
-    const m = model({
-        name: "",
-        list: [],
-        sub: {
-            a: 1,
-            b: 2
-        }
-    })
-    m.name.value = 'test'
-    derive(() => console.log(`My new name is: ${m.name.value}`))
-    derive(() => console.log(`added: ${m.list[list.length-1].value}`))
-
-    Use:
-        Proxy
-        Reflect
-
-
- */
+import { watch } from './s.mjs'
 
 const proto = Object.getPrototypeOf
 const objProto = proto({})
@@ -42,11 +20,9 @@ const asyncProto = proto(async function() {})
 const isObj = _ => proto(_ ?? 0) === objProto
 const isFun = _ => [funProto, asyncProto].includes(proto(_ ?? 0))
 const isNode = _ => !!(_?.nodeType ?? 0)
-const isState = _ => !!(_?.isState ?? false)
+const isState = _ => !!(_?.__isState ?? false)
 
-let derives = null
-
-const schedule = f => setTimeout(f, 0)
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 const getDom = (elt) =>
     isNode(elt)
@@ -55,20 +31,30 @@ const getDom = (elt) =>
             ? getDom(elt())
             : new Text(elt)
 
-const add = (dom, ...children) => {
+function add(dom, ...children)  {
+
+    function createNode(elt) {
+        if (elt === null) return null
+        if (isNode(elt)) return elt
+        return document.createTextNode(elt)
+    }
+
     for (let child of children.flat(Infinity)) {
         if (isState(child)) {
-            const node = document.createTextNode('')
-            bind(child, () => {
-                node.textContent = child.value
+            let node = createNode(child.value)
+            watch(() => {
+                const newNode = createNode(child.value)
+                newNode === null ? node.remove() : node.replaceWith(newNode)
+                node = newNode
             })
             dom.appendChild(node)
         } else
         if (isFun(child)) {
-            const node = document.createTextNode('')
-            const derived = derive(child)
-            bind(derived, () => {
-                node.textContent = child()
+            let node = createNode(child())
+            watch(() => {
+                const newNode = createNode(child())
+                newNode === null ? node.remove() : node.replaceWith(newNode)
+                node = newNode
             })
             dom.appendChild(node)
         } else {
@@ -83,20 +69,19 @@ const tags = new Proxy(
     {
         get(target, tag) {
             return (...args) => {
-                const [props, ...children] = isObj(args[0]) ? args : [{}, ...args]
+                const [props, ...children] = (isObj(args[0]) && !isState(args[0])) ? args : [{}, ...args]
                 const elt = document.createElement(tag)
                 for (let [prop, value] of Object.entries(props)) {
                     if (isFun(value) && prop.startsWith('on')) {
                         elt.addEventListener(prop.slice(2).toLowerCase(), value)
                     } else
                     if (isFun(value)) {
-                        const derived = derive(value)
-                        bind(derived, () => {
+                        watch(() => {
                             elt.setAttribute(prop, value())
                         })
                     } else
                     if (isState(value)) {
-                        bind (value, () => {
+                        watch(() => {
                             elt.setAttribute(prop, value.value)
                         })
                     } else {
@@ -108,65 +93,12 @@ const tags = new Proxy(
         }
     })
 
-const stateProto = {
-    _notify() {
-        for (const listener of this.listeners) {
-            listener(this._value)
-        }
-    },
-    get value() {
-        derives?.add(this)
-        return this._value
-    },
-    get previousValue() {
-        return this._previousValue
-    },
-    set value(newValue) {
-        if (this._value === newValue) return
-        this._previousValue = this._value
-        this._value = newValue
-        this._notify()
-    }
-}
-
-const state = (initialValue) => ({
-    __proto__: stateProto,
-    _value: initialValue,
-    _previousValue: undefined,
-    listeners: new Set(),
-    isState: true
-})
-
-function derive(fn) {
-    const derived = state()
-
-    derives = new Set()
-    try {
-        fn()
-        for(const d of derives) {
-            d.listeners.add(() => {
-                derived.value = fn()
-            })
-        }
-    } finally {
-        derives = null
-    }
-
-    derived.value = fn()
-    return derived
-}
-
-const bind = (state, fn) => {
-    state.listeners.add(fn)
-    schedule( _ => fn(state.value))
-}
-
-const router = (routes, root) => {
+const router = (routes, root, notfound) => {
+    notfound ??= _ => '404: not found'
     const parts = hash => hash.match(/[^:/]+/g)
     const navigate = (hash) => {
         const hparts = parts(hash)
-        const [ route, component ] = routes.find(([h]) => parts(h)[0] === hparts[0]) ?? []
-        if (!route) return
+        const [ route, component ] = routes.find(([h]) => parts(h)[0] === hparts?.[0]) ?? [ '#notfound', notfound ]
         const rparts = parts(route)
         const args = Object.fromEntries(rparts.slice(1).map((v, i) => [v, hparts[i + 1]]))
         const parent = root ?? document.body
@@ -175,13 +107,7 @@ const router = (routes, root) => {
     window.addEventListener('hashchange', e => {
         navigate(window.location.hash)
     })
-    navigate(routes[0][0])
+    navigate(window.location.hash || routes[0][0])
 }
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
-
-const model = () => {
-
-}
-
-export { tags, add, schedule, state, derive, bind, router, sleep }
+export { tags, add, router, sleep }
