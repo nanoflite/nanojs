@@ -1,15 +1,17 @@
 import { state, derive } from './s.mjs'
 import { tags, router, sleep, add } from './n.mjs'
+import { component } from "./c.mjs";
 
-const { h1, h2, div, button, input, sup, hr, span, a, li, ul } = tags
-
+const { h1, h2, div, button, input, sup, hr, span, a, li, ul } = tags()
+const { svg, circle } = tags('http://www.w3.org/2000/svg')
+const { math, mfrac, mi, mn, mo, mrow, msqrt, msup } = tags('http://www.w3.org/1998/Math/MathML')
 
 const counter = state(0)
 const square = derive(_ => counter.value * counter.value)
 
 derive(() => console.log("Counter: ", counter.value))
 
-const menu = [ '#home', '#example', '#derived-state', '#timer/5', "#listdemo", "#test" ]
+const menu = [ '#home', '#example', '#derived-state', '#timer/5', "#listdemo", "#test", "#component", "#svg", '#math' ]
 
 const Menu = (menu) => {
     return div(
@@ -142,11 +144,130 @@ const Test = () => {
     )
 }
 
+const Component = () => {
+    const zero = component('nano-zero')
+    const one = component('nano-one', (args) => h1(`I am ${args.name} component!`))
+    const app = component('nano-app', (args) => {
+        const start = args.start || 0
+        const counter = state(start)
+        return div(
+            "counter: ", counter, button({onclick: () => counter.value++}, "inc"), button({onclick: () => counter.value--}, "dec")
+        )
+    })
+    return div(
+        Header('component'),
+        div(
+            zero(),
+            one({name: 'one'}),
+            one({name: 'two'}),
+            app(),
+            app(13)
+        )
+    )
+}
+
+const Svg = () => {
+    const colors = ['red', 'green', 'blue']
+    const color = state(0)
+    return div(
+        Header('svg'),
+        div(
+            svg(
+                circle({ cx: 50, cy: 50, r: 40, fill: _ => colors[color.value] })
+            )
+        ),
+        div(
+            button({onclick: () => {
+                color.value = (color.value + 1) % colors.length
+            }}, "change color")
+        )
+    )
+}
+
+const Math = () => div(
+    Header('math'),
+    div(
+        math({ display: "block" },
+            mrow(
+                mi(
+                    "x",
+                ),
+                mo(
+                    "=",
+                ),
+                mfrac(
+                    mrow(
+                        mrow(
+                            mo(
+                                "−",
+                            ),
+                            mi(
+                                "b",
+                            ),
+                        ),
+                        mo(
+                            "±",
+                        ),
+                        msqrt(
+                            mrow(
+                                msup(
+                                    mi(
+                                        "b",
+                                    ),
+                                    mn(
+                                        "2",
+                                    ),
+                                ),
+                                mo(
+                                    "−",
+                                ),
+                                mrow(
+                                    mn(
+                                        "4",
+                                    ),
+                                    mo(
+                                        "⁢",
+                                    ),
+                                    mi(
+                                        "a",
+                                    ),
+                                    mo(
+                                        "⁢",
+                                    ),
+                                    mi(
+                                        "c",
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                    mrow(
+                        mn(
+                            "2",
+                        ),
+                        mo(
+                            "⁢",
+                        ),
+                        mi(
+                            "a",
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+    )
+)
+
 router([
     ['#home', Home],
     ['#example', App],
     ['#derived-state', DerivedState],
     ['#timer/:totalSecs', Timer],
     ['#listdemo', ListDemo],
-    ['#test', Test]
+    ['#test', Test],
+    ['#component', Component],
+    ['#svg', Svg],
+    ['#math', Math]
 ])
+
