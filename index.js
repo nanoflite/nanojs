@@ -89,10 +89,10 @@ const ListDemo = () => {
         const deleted = state(false)
         return () => deleted.value
                                     ? null
-                                    : li(text, a({onclick: () => deleted.value = true}, "❌"))
+                                    : li(text, a({href: '', onclick: (e) => {e.preventDefault(); deleted.value = true}}, " [remove]"))
     }
 
-    const list = ul()
+    const list = ul({ type: 'square'})
     const text = input({type: "text"})
     return div(
         Header('todo'),
@@ -108,7 +108,7 @@ const ListDemo = () => {
                     return add(list, todo)
                 }
             },
-            "➕"),
+            "add"),
         list
         )
     )
@@ -119,13 +119,12 @@ const Test = () => {
         const deleted = state(false)
         return () => deleted.value
             ? null
-            : li(text, a({onclick: () => deleted.value = true}, "❌"))
+            : li(text, a({href: '', onclick: (e) => {e.preventDefault(); deleted.value = true}}, " [remove]"))
     }
-    const list = ul()
     return div(
         Header('test'),
         div(
-            ul(
+            ul({ type: 'square'},
                 item('A'),
                 item('B'),
                 item('C'),
