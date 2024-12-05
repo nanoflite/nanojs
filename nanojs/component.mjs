@@ -1,6 +1,6 @@
 // Web Components: component
 
-import { add } from './d.mjs'
+import { add } from './dom.mjs'
 
 class Component extends HTMLElement {
     constructor(app, props) {

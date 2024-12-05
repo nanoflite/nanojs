@@ -1,6 +1,6 @@
 // Reactive state: state, derive, watch,
 
-import { schedule } from "./u.mjs"
+import { schedule } from "./utils.mjs"
 
 const dependingMap = new Map()
 const queuedDerives = new Set()

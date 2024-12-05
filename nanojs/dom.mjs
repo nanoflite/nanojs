@@ -1,6 +1,6 @@
 // DOM: tags, add
 
-import { watch } from './s.mjs'
+import { watch } from './state.mjs'
 
 const proto = Object.getPrototypeOf
 const objProto = proto({})

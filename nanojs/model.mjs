@@ -1,6 +1,6 @@
 // Data model: model, model.json
 
-import { state } from "./s.mjs";
+import { state } from "./state.mjs";
 
 const toJsonProto = {
     json() {
