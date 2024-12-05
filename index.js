@@ -1,5 +1,5 @@
 import { state, derive } from './s.mjs'
-import { tags, router, sleep, add } from './n.mjs'
+import { tags, router, sleep, add } from './d.mjs'
 import { component } from "./c.mjs";
 
 const { h1, h2, div, button, input, sup, hr, span, a, li, ul } = tags()
