@@ -1,8 +1,8 @@
-import { state, derive } from './s.mjs'
-import { tags, add } from './d.mjs'
-import { router } from './r.mjs'
-import { sleep } from './u.mjs'
-import { component } from "./c.mjs"
+import { state, derive } from './nanojs/s.mjs'
+import { tags, add } from './nanojs/d.mjs'
+import { router } from './nanojs/r.mjs'
+import { sleep } from './nanojs/u.mjs'
+import { component } from "./nanojs/c.mjs"
 
 const { h1, h2, div, button, input, sup, hr, span, a, li, ul } = tags()
 const { svg, circle } = tags('http://www.w3.org/2000/svg')
