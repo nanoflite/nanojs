@@ -1,4 +1,4 @@
-// tags, add, router, sleep
+// DOM: tags, add
 
 import { watch } from './s.mjs'
 
@@ -11,8 +11,6 @@ const isObj = _ => proto(_ ?? 0) === objProto
 const isFun = _ => [funProto, asyncProto].includes(proto(_ ?? 0))
 const isNode = _ => !!(_?.nodeType ?? 0)
 const isState = _ => !!(_?.__isState ?? false)
-
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 function getDom(elt) {
     return isNode(elt)
@@ -84,21 +82,4 @@ function tags(namespace) {
         })
 }
 
-function router(routes, root, notfound) {
-    notfound ??= _ => '404: not found'
-    const parts = hash => hash.match(/[^:/]+/g)
-    const navigate = (hash) => {
-        const hparts = parts(hash)
-        const [ route, component ] = routes.find(([h]) => parts(h)[0] === hparts?.[0]) ?? [ '#notfound', notfound ]
-        const rparts = parts(route)
-        const args = Object.fromEntries(rparts.slice(1).map((v, i) => [v, hparts[i + 1]]))
-        const parent = root ?? document.body
-        parent.replaceChildren(component(args))
-    }
-    window.addEventListener('hashchange', e => {
-        navigate(window.location.hash)
-    })
-    navigate(window.location.hash || routes[0][0])
-}
-
-export { tags, add, router, sleep }
+export { tags, add }

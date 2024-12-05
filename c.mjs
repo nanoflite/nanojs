@@ -1,4 +1,4 @@
-// component
+// Web Components: component
 
 import { add } from './d.mjs'
 

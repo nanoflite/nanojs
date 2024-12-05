@@ -1,4 +1,5 @@
-import { state, watch, derive, model } from './s.mjs'
+import { state, watch, derive } from './s.mjs'
+import { model } from './m.mjs'
 
 const animals = state(['cat', 'dog', 'bird'])
 watch(() => {
