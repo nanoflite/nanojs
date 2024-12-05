@@ -1,8 +1,4 @@
-import { state, derive } from './nanojs/state.mjs'
-import { tags, add } from './nanojs/dom.mjs'
-import { router } from './nanojs/router.mjs'
-import { sleep } from './nanojs/utils.mjs'
-import { component } from "./nanojs/component.mjs"
+import { state, derive, tags, add, router, sleep, component } from './nanojs'
 
 const { h1, h2, div, button, input, sup, hr, span, a, li, ul } = tags()
 const { svg, circle } = tags('http://www.w3.org/2000/svg')
@@ -175,7 +171,7 @@ const Svg = () => {
         Header('svg'),
         div(
             svg(
-                circle({ cx: 50, cy: 50, r: 40, fill: _ => colors[color.value] })
+                circle({ cx: 60, cy: 60, r: 50, fill: _ => colors[color.value] })
             )
         ),
         div(
