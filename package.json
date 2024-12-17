@@ -1,10 +1,33 @@
 {
-  "name": "u_reactive_js_framework",
+  "name": "nanojs",
   "version": "1.0.0",
-  "description": "",
+  "description": "nanojs is a lightweight reactive framework with built-in utilities. It provides DOM manipulation, state management, a hash-based router, a reactive data model, and support for web components",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test.mjs",
+    "build": "webpack"
   },
-  "private": true
+  "private": true,
+  "author": "Johan Van den Brande",
+  "license": "MIT",
+  "keywords": [
+    "reactive",
+    "framework",
+    "minimal",
+    "state-management",
+    "dom",
+    "router",
+    "web-components",
+    "data-model",
+    "hash-router",
+    "nanojs",
+    "lightweight",
+    "reactivity",
+    "frontend-framework",
+    "component-based"
+  ],
+  "devDependencies": {
+    "webpack": "^5.97.1",
+    "webpack-cli": "^5.1.4"
+  }
 }
