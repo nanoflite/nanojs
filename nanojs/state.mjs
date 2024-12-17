@@ -8,21 +8,22 @@ const queuedDerives = new Set()
 let activeDependingSet = null
 let activeDepending = null
 
-function states(...initialValues) {
-    const proxy = new Proxy(
-        {
-            i: 0,
-            states: []
-        },
-        {
-            get(target, name) {
-                return target.states[target.i] = state(initialValues[target.i++]);
-            }
-        })
-    proxy.reset = () => {
-        states.forEach(((state, i) => state.value = initialValues[i]))
+function states() {
+    let values = null, i = 0, states = []
+    const _states = (...initialValues) => {
+        values = initialValues
+        const proxy = new Proxy({},
+            {
+                get(target, name) {
+                    return states[i] = state(values[i++]);
+                },
+            })
+        return proxy
     }
-    return proxy
+    _states.reset = () => {
+        states.forEach(((state, i) => state.value = values[i]))
+    }
+    return _states
 }
 
 function state(initialValue) {
