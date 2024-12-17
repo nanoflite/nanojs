@@ -1,4 +1,4 @@
-// Reactive state: state, derive, watch,
+// Reactive state: state, states, derive, watch,
 
 import { schedule } from "./utils.mjs"
 
@@ -7,6 +7,23 @@ const queuedDerives = new Set()
 
 let activeDependingSet = null
 let activeDepending = null
+
+function states(...initialValues) {
+    const proxy = new Proxy(
+        {
+            i: 0,
+            states: []
+        },
+        {
+            get(target, name) {
+                return target.states[target.i] = state(initialValues[target.i++]);
+            }
+        })
+    proxy.reset = () => {
+        states.forEach(((state, i) => state.value = initialValues[i]))
+    }
+    return proxy
+}
 
 function state(initialValue) {
     return new Proxy(
@@ -79,4 +96,4 @@ function derive(fn) {
     return derived
 }
 
-export { state, watch, derive }
+export { state, states, watch, derive }
