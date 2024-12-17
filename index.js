@@ -20,7 +20,7 @@ const Menu = (menu) => {
 }
 
 const Header = (page) => div(
-    h1("n, a nano size reactive framework."),
+    h1("nanojs ~ a nano size reactive framework"),
     Menu(menu),
     h2(page)
 )
@@ -28,13 +28,13 @@ const Header = (page) => div(
 const Home = () => div(
     Header('home'),
     div(
-        `Welcome to n.js! A minimal reactive framework for building web apps.`
+        `Welcome to nanojs! A minimal reactive framework for building web apps.`
     )
 )
 
 const App = () => div(
     Header('example'),
-    div({ style: "background-color: grey; color: white; padding: 10px; border-radius: 10px;"},
+    div(
         h2('state'),
         div("counter: ", counter),
         h2('derived state'),
@@ -104,7 +104,6 @@ const ListDemo = () => {
             {
                 onclick: () => {
                     const todo = item({text: text.value})
-                    console.log(todo)
                     return add(list, todo)
                 }
             },
@@ -163,6 +162,16 @@ const Component = () => {
     )
 }
 
+const beat = (r, m, M) => {
+    const R = state(r)
+    let d = 1
+    setInterval(()=>{
+        if (R.value + d > M || R.value + d < m) d = -1 * d
+        R.value += d
+    }, 20)
+    return R
+}
+
 const Svg = () => {
     const colors = ['red', 'green', 'blue']
     const color = state(0)
@@ -170,12 +179,12 @@ const Svg = () => {
         Header('svg'),
         div(
             svg(
-                circle({ cx: 60, cy: 60, r: 50, fill: _ => colors[color.value] })
+                circle({ cx: 60, cy: 60, r: beat(50, 40, 60), fill: _ => colors[color.value] })
             )
         ),
         div(
             button({onclick: () => {
-                color.value = (color.value + 1) % colors.length
+                color.value = ++color.value % colors.length
             }}, "change color")
         )
     )
