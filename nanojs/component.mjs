@@ -11,7 +11,7 @@ class Component extends HTMLElement {
     }
 
     connectedCallback() {
-        add(this.shadow, this.app(this.props))
+        add(this.shadow, this.app(this.props, this.shadow))
     }
 }
 
