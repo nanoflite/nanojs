@@ -1,11 +1,11 @@
 import { tags, add } from './dom.mjs'
 import { state, states, watch, derive } from './state.mjs'
-import { sleep, schedule } from './utils.mjs'
+import { sleep, schedule, css, $ } from './utils.mjs'
 import { router } from './router.mjs'
 import { model } from './model.mjs'
 import { component } from './component.mjs'
 
-export { tags, add, state, states, watch, derive, sleep, schedule, router, model, component }
+export { tags, add, state, states, watch, derive, sleep, schedule, css, $, router, model, component }
 
 console.log(`
             nanojs
@@ -14,5 +14,5 @@ console.log(`
             ( ..)
            C(")(")
            
-       (c) 2024 - JVdB
+       (c) 2024-2025 - JVdB
 `)
