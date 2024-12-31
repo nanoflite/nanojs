@@ -5,8 +5,8 @@ import { schedule } from "./utils.mjs"
 const dependingMap = new Map()
 const queuedDerives = new Set()
 
-let activeDependingSet = null
-let activeDepending = null
+const activeDependingSetStack = []
+const activeDependingStack = []
 
 function states() {
     let values = null, i = 0, states = []
@@ -54,24 +54,24 @@ function state(initialValue) {
     })
 }
 
-
 function watch(fn) {
-   activeDependingSet = new Set()
-    activeDepending = fn
+    const activeDependingSet = new Set()
+    activeDependingSetStack.push(activeDependingSet)
+    activeDependingStack.push(fn)
     fn()
     for (const state of activeDependingSet) {
         if (!dependingMap.has(state)) {
             dependingMap.set(state, new Set())
         }
-        dependingMap.get(state).add(activeDepending)
+        dependingMap.get(state).add(fn)
     }
-    activeDepending = null
-    activeDependingSet = null
+    activeDependingStack.pop()
+    activeDependingSetStack.pop()
 }
 
 function findDepending(state) {
-    if (!activeDepending) return
-    activeDependingSet.add(state)
+    if (activeDependingStack.length === 0) return
+    activeDependingSetStack[activeDependingSetStack.length - 1].add(state)
 }
 
 function updateDepending(state) {
