@@ -1,94 +1,48 @@
 import {add, state, tags, derive, component, css, $} from "./nanojs"
 
-const { div, h1, hr, label, input, select, option, style, br, span, button } = tags()
+const { div, h1, hr, label, input, select, option, style, br, span, button, schedule } = tags()
 
 const styles = css`
-#container {
-    border: 1px solid #ccc;
-    width: 300px;
-    padding: 10px;
-}
-
-#header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    background-color: #f9f9f9;
-    padding: 5px;
-    border-bottom: 1px solid #ddd;
-}
-
-#content {
-    padding: 10px;
-}
-
-    /* General styles for the floating UI */
     .floating-ui {
+        display: flex;
+        flex-direction: column;
         position: fixed;
         background-color: white;
-        border: 1px solid #ccc;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease-in-out;
+        border: 1px solid #333;
+        box-shadow: 8px 8px 0;
         z-index: 1000;
-        max-width: 300px;
+        max-width: 500px;
+        min-width: 300px;
+        margin: 10px;
     }
 
-    /* Header styles */
     .floating-ui .header {
-        background-color: #f9f9f9;
+        background-color: #aaa;
         padding: 10px;
-        display: flex;
         justify-content: space-between;
         cursor: pointer;
     }
 
-    /* Content styles (hidden when collapsed) */
     .floating-ui .content {
-        padding: 10px;
-        display: none;
+        overflow: hidden;
     }
 
-    /* Position-specific styles */
-    .floating-ui[data-position="top"] {
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
+    .floating-ui[data-position="bottom-left"] .header {
+        order: 2;
     }
-
-    .floating-ui[data-position="bottom"] {
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-
-    .floating-ui[data-position="left"] {
-        top: 50%;
-        left: 0;
-        transform: translateY(-50%);
-    }
-
-    .floating-ui[data-position="right"] {
-        top: 50%;
-        right: 0;
-        transform: translateY(-50%);
-    }
-
-    /* Expanded state */
-    .floating-ui.expanded .content {
-        display: block;
-    }
-
-    /* Collapsed header position adjustments */
-    .floating-ui[data-position="bottom"] .header {
+    
+    .floating-ui[data-position="bottom-right"] .header {
         order: 2;
     }
 
-    .floating-ui[data-position="top"] .header {
+    .floating-ui[data-position="top-left"] .header {
         order: -1;
     }
 
-    /* Position-specific styles */
+    .floating-ui[data-position="top-right"] .header {
+        order: -1;
+    }
+    
     .floating-ui[data-position="top-left"] {
         top: 0;
         left: 0;
@@ -109,47 +63,89 @@ const styles = css`
         right: 0;
     }
 
-    .floating-ui[data-position="center"] {
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+    .separator {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 20px 0;
+        color: #666; /* Text color */
     }
-    
+
+    .separator::before,
+    .separator::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #ccc;
+        margin: 0 10px;
+    }
+
+    .separator span {
+        white-space: nowrap;
+        padding: 0 10px;
+        font-size: 14px;
+        color: #666;
+    }
 `
+
 function config(title, {position = 'top-right', open = false} = {}) {
     const fields = new Map()
     const states = []
     const _config = (...args) => {
-        for (let i = 0; i < args.length; i++) {
-            const arg = args[i]
-            switch(arg.type) {
-                case 'bool':
+        let i = 0
+        return new Proxy({},
+            {
+                get(target, name) {
+                    const arg = args[i++]
+                    const separators = []
+                    while (i < args.length && args[i].type === 'separator') {
+                        separators.push(div({class: 'separator'}, span(args[i].label)))
+                        i++
+                    }
                     const _state = state(arg.default)
-                    const _field = bool(arg.name, arg.label, _state)
-                    fields.set(arg.name, _field)
                     states.push(_state)
-                    break
-                default:
-                    break
+                    let _field
+                    switch(arg.type) {
+                        case 'bool':
+                            _field = bool(name, arg.label, _state)
+                            break
+                        case 'range':
+                            _field = range(name, arg.label, arg.min, arg.max, arg.step, _state)
+                            break
+                        case 'color':
+                            _field = color(name, arg.label, _state)
+                            break
+                        case 'text':
+                            _field = text(name, arg.label, _state)
+                            break
+                        case 'choice':
+                            if (arg.multiple) _state.value = [arg.default]
+                            _field = choice(name, arg.label, arg.options, _state, arg.multiple)
+                            break
+                    }
+                    if (separators.length > 0) {
+                        _field = div(
+                            _field,
+                            ...separators
+                        )
+                    }
+                    fields.set(name, _field)
+                    return _state
+                }
             }
-        }
-        return states
+        )
     }
     _config.dom = component('config-ui', (args, root) => {
+        const openState = state(open)
         return [
             style(styles),
-            div({id: 'container', class: 'floating-ui', 'data-position': position},
-                div({id:"header", onclick: () => {
-                        const uiDiv = $('#content', root)
-                        const toggleButton = $('#toggleButton', root)
-                        const visible = uiDiv.style.display === 'block'
-                        uiDiv.style.display = visible ? 'none' : 'block'
-                        toggleButton.textContent = visible ? '▲' : '▼'
-                    }},
+            div({class: 'floating-ui', 'data-position': position},
+                div({   class: "header",
+                        onclick: () => openState.value = !openState.value
+                    },
                     span(title),
-                    button({id:"toggleButton"}, open ? '▲' : '▼')
+                    span({style: 'float: right;'}, () => openState.value ? '▲' : '▼')
                 ),
-                div({id:"content", style:`display: ${open ? 'block' : 'none'};`},
+                div({class: "content", style: () => `display: ${openState.value ? 'block' : 'none'}`},
                     ...Array.from(fields.values())
                 )
             )
@@ -158,18 +154,34 @@ function config(title, {position = 'top-right', open = false} = {}) {
     return _config
 }
 
-// function choice(name, options) {
-//     return select({name: name}, options.map(option))
-// }
-// function multiple(name, options) {
-//     return select({name: name, multiple: true}, options.map(option))
-// }
-// function range(name, min, max, step) {
-//     return input({type: "range", name: name, min: min, max: max, step: step})
-// }
-// function text(name, value) {
-//     return input({type: "text", name: name, value: value})
-// }
+// options is a map (value: desc)
+function choice(name, labl, options, value, multiple = false) {
+    const _options = []
+    for (const [key, val] of Object.entries(options)) {
+        const _option = option({value: key}, val)
+        if (val === value.value) _option.setAttribute('selected', true)
+        _options.push(_option)
+    }
+    const _select = select({name: name, oninput: (e) => {
+        const selectedValues = Array.from(e.target.selectedOptions).map(o => o.value)
+        value.value = multiple ? selectedValues : selectedValues[0]
+    }}, _options)
+    if (multiple) {
+        _select.setAttribute('multiple', true)
+        _select.setAttribute('size', _options.length > 4 ? 4 : _options.length)
+    }
+    return div(
+        label({for: name}, name),
+        _select
+    )
+}
+
+function text(name, labl, value) {
+    return div(
+        label({for: name}, labl),
+        input({type: "text", name: name, value: value, oninput: (e) => value.value = e.target.value})
+    )
+}
 
 function bool(name, labl, value) {
     return div(
@@ -178,32 +190,38 @@ function bool(name, labl, value) {
                 type: "checkbox",
                 name: name,
                 checked: (e, attr) => {
-                    console.log(`propperdepropperdeprop: ${attr}`);
                     e.checked = value.value
                 },
                 onchange: (e) => value.value = e.target.checked})
     )
 }
 
-// example
-const params = config('settings')
-const [ activate ] = params(
-    {type: 'bool', label: 'Activate:', default: true}
-)
+function range(name, labl, min, max, step, value) {
+    return div(
+        label({for: name}, labl),
+        input({
+            type: "range",
+            name: name,
+            min: min,
+            max: max,
+            step: step,
+            value: value.value,
+            oninput: (e) => value.value = e.target.value
+        }),
+        span({style: () => `margin-left: 10px`}, value)
+    )
+ }
 
-//
-//const [ toppings, breakfast, temperature, name, activate, font ] = params(
-//    choice("toppings", ["butter", "choklat", "dust"]),
-//    multiple("breakfast", ["eggs", "spam", "bacon"]),
-//    range("temperature", 0, 100, 1),
-//    text("name", "John"),
-//    bool("activate", true),
-//    // font("font", ["Arial", "Helvetica", "Times New Roman"])
-//)
-//
-// const boolState = state(true)
-derive(()=>{
-    console.log(`--> activate: ${activate.value}`)
-})
-// const boolField = bool("activate", "Activate: ", boolState)
-add(document.body, params.dom())
+ function color(name, labl, value) {
+    return div(
+        label({for: name}, labl),
+        input({
+            type: "color",
+            name: name,
+            value: value.value,
+            oninput: (e) => value.value = e.target.value
+        })
+    )
+ }
+
+export { config, color, range, bool, text, choice }
