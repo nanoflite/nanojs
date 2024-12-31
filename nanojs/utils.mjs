@@ -10,29 +10,28 @@ const css = (strings, ...values) => {
 
 const $ = (selector, context = document) => {
     const elements = (context.shadowRoot ?? context).querySelectorAll(selector)
-    return new Proxy(
-        {
-            css: (property, value) => {
-                elements.forEach(el => (el.style[property] = value))
-                return this
-            },
-            on: (event, handler) => {
-                elements.forEach(el => el.addEventListener(event, handler))
-                return this
+    return new Proxy(elements, {
+        get(target, prop, receiver) {
+            if (prop === 'css') {
+                return (property, value) => {
+                    target.forEach(el => (el.style[property] = value))
+                    return target
+                }
             }
+            if (prop === 'on') {
+                return (event, handler) => {
+                    target.forEach(el => el.addEventListener(event, handler))
+                    return target
+                }
+            }
+            if (target.length === 1) return target[0][prop]
+            return Array.from(target).map(el => el[prop])
         },
-        {
-            get(obj, prop) {
-                if (prop in obj) return obj[prop]
-                const props = Array.from(elements).map(e => e[prop])
-                console.log(props)
-                console.log(props.length)
-                if (props.length === 1) return props[0]
-                if (props.length > 1) return props
-                return undefined
-            }
+        set(target, prop, value) {
+            target.forEach(el => (el[prop] = value))
+            return true
         }
-    )
+    })
 }
 
 export { sleep, schedule, css, $ }
