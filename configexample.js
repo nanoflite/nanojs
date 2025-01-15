@@ -14,13 +14,13 @@ const { activate, temperature, colour, name, chooseone, choosemultiple } = param
     {type: 'choice', label: 'Toppings:', default: 'butter', options: {butter: 'Butter', choklat: 'Choklat', dust: 'Dust'}},
     {type: 'choice', label: 'Breakfast:', default: 'eggs', options: {eggs: 'Eggs', spam: 'Spam', bacon: 'Bacon'}, multiple: true}
 )
+add(document.body, params.dom())
 
 derive(()=>{
     console.log(`--> activate: ${activate.value}`)
     console.log(`--> temperature: ${temperature.value}`)
 })
 
-add(document.body, params.dom())
 add(document.body, () => div(
         h1('Hello World'),
         span(`Am I activated? ${activate.value ? 'Yes' : 'No'}`),
