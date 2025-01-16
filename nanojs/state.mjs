@@ -97,4 +97,25 @@ function derive(fn) {
     return derived
 }
 
-export { state, states, watch, derive }
+async function change(state) {
+    return new Promise(resolve => {
+        const old = state.value
+        watch(() => {
+            if (state.value !== old) {
+                resolve(state.value)
+            }
+        })
+    })
+}
+
+async function until(state, fn) {
+    return new Promise(resolve => {
+        watch(() => {
+            if (fn(state.value)) {
+                resolve(state.value)
+            }
+        })
+    })
+}
+
+export { state, states, watch, derive, change, until }
