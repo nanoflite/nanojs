@@ -3,7 +3,7 @@ import { add, tags, states, sleep, watch, change } from "./nanojs"
 const { span, div, h1, button } = tags()
 
 const gamestate = states()
-const { score, timer, showscore, moles, running, lastwacked } = gamestate(0, 3, false, new Array(9).fill(false), false, -1)
+const { score, timer, showscore, moles, running, lastwacked } = gamestate(0, 15, false, new Array(9).fill(false), false, -1)
 
 const mole = (i) => div(
     {   class: 'mole',
@@ -26,7 +26,7 @@ const play = async () => {
     while (--timer.value > 0) {
         const theMole = nextRandomMole()
         clearMoles()
-        await sleep(200)
+        await sleep(200+Math.floor(Math.random()*500))
         moles.value = moles.value.map((_, i) => i === theMole)
         await sleep(800)
     }
