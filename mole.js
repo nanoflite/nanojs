@@ -1,47 +1,58 @@
-import { add, tags, states, sleep } from "./nanojs"
+import { add, tags, states, sleep, watch, change } from "./nanojs"
 
-const { div, h1, button } = tags()
+const { span, div, h1, button } = tags()
 
 const gamestate = states()
-const { score, timer, moles, running, lastwacked } = gamestate(0, 10, new Array(9).fill(false), false, -1)
+const { score, timer, showscore, moles, running, lastwacked } = gamestate(0, 3, false, new Array(9).fill(false), false, -1)
 
 const mole = (i) => div(
     {   class: 'mole',
-        onclick: () => {
+        onclick: _ => {
             if (running.value && lastwacked.value !== i && moles.value[i]) score.value++
             lastwacked.value = i
         }
     },
-    () => moles.value[i] ? `🐹` : `_`)
+    _ => moles.value[i] ? `🐹` : ` `)
 
-const randomMole = () => {
+const nextRandomMole = _ => {
     const i = Math.floor(Math.random() * moles.value.length)
-    return moles.value[i] ? randomMole() : i
+    return moles.value[i] ? nextRandomMole() : i
 }
 
-const play = async (evt) => {
-    const btn = evt.currentTarget
-    if (running.value) return
-    btn.disabled = running.value = true
-    while (timer.value > 0) {
-        const theMole = randomMole()
-        moles.value = moles.value.map(_ => false)
+const clearMoles = _ => moles.value = moles.value.map(_ => false)
+
+const play = async () => {
+    running.value = true
+    while (--timer.value > 0) {
+        const theMole = nextRandomMole()
+        clearMoles()
         await sleep(200)
         moles.value = moles.value.map((_, i) => i === theMole)
         await sleep(800)
-        --timer.value
     }
-    alert(`Game over! Score: ${score.value}`)
+    clearMoles()
+    showscore.value = true
+    await change(showscore)
     gamestate.reset()
-    btn.disabled = false
 }
 
-const game = () => div(
-    h1('Whack-A-Mole'),
-    div(() => `Time: ${timer.value}s`),
-    div(() => `Score: ${score.value}`),
-    div({class: 'grid'}, moles.value.map((_, i) => mole(i))),
-    button({onclick: play}, 'Start')
-)
-
-add(document.body, game())
+add(document.body, () => div({ class: 'container' },
+    div({ class: 'game' },
+        h1('Whack-A-Mole'),
+        div({ class: 'game-info'},
+            span(_ => `Time: ${timer.value}s`),
+            span(_ => `Score: ${score.value}`)
+        ),
+        div({class: 'grid'}, moles.value.map((_, i) => mole(i))),
+        button({
+            style: _ => running.value || showscore.value ? `background: #aaa` : `background: #007bff;`,
+            onclick: _ => running.value || play()
+        }, 'Start'),
+        div({ class: 'scoreboard', style: () => `display: ${showscore.value ? "block" : "none"};`},
+            h1('Game Over!'),
+            div(_ => `Score: ${score.value}`),
+            button({ onclick: _ => showscore.value = false }, 'OK')
+        )
+    ),
+    div({ class: 'footer' }, `(c) 2025 JVdB - powered by nanojs`)
+))

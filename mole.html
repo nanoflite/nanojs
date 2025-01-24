@@ -4,20 +4,98 @@
     <meta charset="UTF-8">
     <title>mole</title>
     <style>
+        .container {
+            position: relative;
+            max-width: 400px;
+            margin: auto;
+            font-family: 'Arial', sans-serif;
+        }
+        .game {
+                text-align: center;
+                margin: auto;
+                margin-top: 20px;
+                margin-bottom: 0px;
+                padding: 10px;
+                border: 2px solid #ccc;
+                border-radius: 10px;
+                background: linear-gradient(to bottom, #f7f7f7, #eaeaea);
+                box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+        }
+        .game h1 {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .game-info {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .game-info span {
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            background: #007bff;
+        }
+
       .grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
+        grid-template-columns: repeat(3, 35px);
+        gap: 3px;
+          margin-bottom: 20px;
       }
       .mole {
         font-size: 24px;
+        font-weight: bold;
         cursor: pointer;
         background-color: #eee;
         border: 1px solid #ccc;
         border-radius: 5px;
         width: 32px;
-          height: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform 0.2s, background-color 0.2s;
       }
+        .mole:hover {
+            transform: scale(1.05);
+            background-color: #e0e0e0;
+        }
+
+        .scoreboard {
+            position: absolute; /* Position relative to .game-container */
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, -50%); /* Adjust for perfect centering */
+            border: none;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            background: white;
+            text-align: center;
+            max-width: 300px;
+            width: 80%;
+            z-index: 10; /* Ensure it's above other content */
+        }
+        .footer {
+            text-align: right;
+            margin-right:1em;
+            font-size: 0.8em;
+        }
     </style>
 </head>
 <body>
