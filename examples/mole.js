@@ -1,4 +1,4 @@
-import { add, tags, states, sleep, watch, change } from "./nanojs"
+import { add, tags, states, sleep, watch, change } from "../nanojs/index.mjs"
 
 const { span, div, h1, button } = tags()
 
