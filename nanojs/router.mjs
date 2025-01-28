@@ -11,9 +11,7 @@ function router(routes, root, notfound) {
         const parent = root ?? document.body
         parent.replaceChildren(component(args))
     }
-    window.addEventListener('hashchange', e => {
-        navigate(window.location.hash)
-    })
+    window.addEventListener('hashchange', _ => navigate(window.location.hash))
     navigate(window.location.hash || routes[0][0])
 }
 
