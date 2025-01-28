@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>nanojs: A Lightweight Reactive Framework</title>
     <style>
         body {
@@ -23,7 +22,6 @@
         }
         main {
             margin: 20px auto;
-            max-width: 800px;
             background: white;
             border-radius: 8px;
             padding: 20px;
@@ -47,7 +45,32 @@
             font-size: 0.9em;
             color: #555;
         }
+        code {
+            font-family: monospace;
+            font-size: 10px;
+        }
+        .box_container {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .box {
+            flex: 1;
+            padding: 10px;
+        }
+        #voeter {
+            float: right;
+            padding: 20px;
+        }
+        button {
+            margin: 4px;
+        }
     </style>
+    <link rel="stylesheet" href="mole.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+    <script>hljs.highlightAll();</script>
 </head>
 <body>
 <header>
@@ -57,44 +80,125 @@
 <main>
     <section>
         <h2>Overview</h2>
-        <p>nanojs is a minimalistic reactive framework designed to provide developers with powerful tools for building modern web applications with ease. The framework includes features like DOM manipulation, state management, a hash-based router, a reactive data model, and support for web components, all packed into a lightweight solution.</p>
+        <p>nanojs is a minimalistic reactive framework designed to provide developers with enough tools to build web applications. The framework includes features like DOM manipulation, state management, a hash-based router, a reactive data model, and support for web components.</p>
     </section>
     <section>
         <h2>Features</h2>
         <ul>
             <li>Reactive state management.</li>
-            <li>Built-in lightweight DOM manipulation utilities.</li>
+            <li>Built-in DOM manipulation utilities.</li>
+            <li>Support for HTML, SVG and MathML.</li>
             <li>Hash-based routing for single-page applications.</li>
-            <li>Reactive data model for dynamic updates.</li>
-            <li>Support for web components for modular development.</li>
+            <li>Reactive data model supporting dynamic updates and JSON serialisation.</li>
+            <li>...</li>
         </ul>
+        <h3>Missing examples</h3>
+        Missing in this page: until, schedule, css, router, model, component, ...
     </section>
     <section>
-        <h2>Usage</h2>
-        <p>To use NanoJS in your project:</p>
-        <ol>
-            <li>Install NanoJS via npm (or add it to your project).</li>
-            <li>Import the framework modules as needed in your JavaScript code.</li>
-            <li>Start building reactive components and managing your state effortlessly!</li>
-        </ol>
-        <p>Example:</p>
-        <pre>
-        <code>
-import { state, derive, tags, add, router, sleep, component } from './nanojs'
-const { h1, h2, div, button, input, sup, hr, span, a, li, ul } = tags()
+        <h2>Example</h2>
+        <div class="box_container">
+            <div class="box">
+                <h3>Game</h3>
+                <div id="app"></div>
+            </div>
+            <div id="code" class="box">
+                <h3>Code</h3>
+                <pre>
+  <code class="language-javascript">import { add, tags, state, states, sleep, watch, change, S } from "../nanojs/index.mjs"
 
-const App = () => div(
-    Header('example'),
+const { span, div, h1, button } = tags()
+
+const gamestate = states()
+const { score, timer, showscore, moles, running, lastwacked } = gamestate(0, 15, false, new Array(9).fill(false), false, -1)
+
+const high = state(localStorage.getItem('high') || 0)
+watch( _ => { if (score.value > high.value) high.value = score.value, localStorage.setItem('high', high.value) })
+
+const mole = (i) => div({ class: 'mole', onclick: _ =>
+        {
+            if (running.value && lastwacked.value !== i && moles.value[i]) score.value++
+            lastwacked.value = i
+        }
+    }, _ => moles.value[i] ? `🐹` : ` `)
+
+const nextRandomMole = _ => {
+    const i = Math.floor(Math.random() * moles.value.length)
+    return moles.value[i] ? nextRandomMole() : i
+}
+
+const clearMoles = _ => moles.value = moles.value.map(_ => false)
+
+const play = async () => {
+    running.value = true
+    while (--timer.value > 0) {
+        const theMole = nextRandomMole()
+        clearMoles()
+        await sleep(200+Math.floor(Math.random()*600))
+        moles.value = moles.value.map((_, i) => i === theMole)
+        await sleep(400+Math.floor(Math.random()*400))
+    }
+    clearMoles()
+    showscore.value = true
+    await change(showscore)
+    gamestate.reset()
+}
+
+add(S('#app'), () => div({ class: 'container' },
+    div({ class: 'game' },
+        h1('Whack-A-Mole'),
+        div({ class: 'game-info'},
+            span(_ => `Time: ${timer.value}s`),
+            span(_ => `Score: ${score.value}`),
+            span(_ => `High: ${high.value}`)
+        ),
+        div({class: 'grid'}, moles.value.map((_, i) => mole(i))),
+        button({ style: _ => running.value || showscore.value ? `background: #aaa` : `background: #007bff;`,
+                 onclick: _ => running.value || play()
+               }, 'Start'),
+        div({ class: 'scoreboard', style: () => `display: ${showscore.value ? "block" : "none"};`},
+            h1('Game Over!'),
+            div(_ => `Score: ${score.value}`),
+            button({ onclick: _ => showscore.value = false }, 'OK')
+        )
+    ),
+    div({ class: 'footer' }, `(c) 2025 JVdB - powered by nanojs`)
+))
+  </code>
+</pre>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Quick Overview</h2>
+        <div class="box_container">
+            <div class="box" id="overview">
+                <h3>Example</h3>
+            </div>
+            <div id="code" class="box">
+                <h3>Code</h3>
+                <pre>
+  <code class="language-javascript">import { state, derive, tags, add, S } from './nanojs'
+
+const { hr, h3, div, button, input, sup } = tags()
+
+const counter = state(0)
+const square = derive(_ => counter.value * counter.value)
+
+derive(() => console.log("Counter: ", counter.value))
+
+const QuickOverview = () => div(
     div(
-        h2('state'),
+        h3('state'),
         div("counter: ", counter),
-        h2('derived state'),
+        h3('derived state'),
         div("square:", counter, sup(2),'=', square),
-        h2('property'),
+        h3('property'),
         input({type: "number", value: _ => counter.value, disabled: true}),
-        h2('state-derived property'),
+        h3('state-derived property'),
         div({style: () => `font-size: ${8 + counter.value}px;`}, "Hello"),
-        h2('state-derived child'),
+        h3('state-derived child'),
         div(counter, sup(2), () => ` = ${square.value}`),
         hr(),
         button({ onclick: () => counter.value++ }, 'inc'),
@@ -102,23 +206,19 @@ const App = () => div(
         button({ onclick: () => counter.value = 0 }, 'reset')
     )
 )
-add(document.body, App())
-        </code>
-      </pre>
+
+add(S('#overview'), QuickOverview)
+  </code>
+</pre>
+            </div>
+        </div>
     </section>
-    <section>
-        <h2>Getting Started</h2>
-        <p>For more examples and detailed documentation, visit the <a href="https://example.com">official NanoJS website</a> or check the repository on <a href="https://github.com/your-repo">GitHub</a>.</p>
-    </section>
-    <section>
-        <h2>Contact</h2>
-        <p>Author: Johan Van den Brande</p>
-        <p>License: MIT</p>
-        <p>For issues or contributions, visit the <a href="https://github.com/nanoflite/nanojs">nanojs GitHub repository</a>.</p>
-    </section>
+
+
+
+    <div id="voeter">(c) 2025 <a href="https://vandenbran.de">JVdB</a> - powered by nanojs</div>
 </main>
-<footer>
-    <p>&copy; 2024 nanojs Framework. All rights reserved.</p>
-</footer>
+<script type="module" src="mole.js"></script>
+<script type="module" src="quick_overview.js"></script>
 </body>
 </html>
