@@ -4,8 +4,9 @@ import { sleep, schedule, css, S } from './utils.mjs'
 import { router } from './router.mjs'
 import { model } from './model.mjs'
 import { component } from './component.mjs'
+import { style } from './style.mjs'
 
-export { tags, add, state, states, watch, derive, change, until, sleep, schedule, css, S, router, model, component }
+export { tags, add, state, states, watch, derive, change, until, sleep, schedule, css, S, router, model, component, style }
 
 console.log(`
             nanojs
