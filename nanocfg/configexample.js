@@ -1,4 +1,4 @@
-import {add, tags, derive } from "./nanojs"
+import {add, tags, derive } from "../nanojs/index.mjs"
 const { div, h1, br, span } = tags()
 
 import { config } from './config.js'

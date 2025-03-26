@@ -1,4 +1,4 @@
-import {add, state, tags, derive, component, css, $} from "./nanojs"
+import {add, state, tags, derive, component, css, $} from "../nanojs/index.mjs"
 
 const { div, h1, hr, label, input, select, option, style, br, span, button, schedule } = tags()
 

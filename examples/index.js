@@ -1,4 +1,4 @@
-import { state, derive, tags, add, router, sleep, component } from './nanojs'
+import { state, derive, tags, add, router, sleep, component } from '../nanojs/index.mjs'
 
 const { h1, h2, div, button, input, sup, hr, span, a, li, ul } = tags()
 const { svg, circle } = tags('http://www.w3.org/2000/svg')

@@ -2,7 +2,7 @@
   "name": "nanojs",
   "version": "1.0.0",
   "description": "nanojs is a lightweight reactive framework with built-in utilities. It provides DOM manipulation, state management, a hash-based router, a reactive data model, and support for web components",
-  "main": "index.js",
+  "main": "examples/index.js",
   "scripts": {
     "test": "node test.mjs",
     "build": "webpack",
