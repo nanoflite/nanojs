@@ -10,19 +10,18 @@ html {
     background: var(--bg);
     color: var(--fg);
     font-family: var(--mono);
-    font-size: 16px;
+    font-size: 8pt;
     line-height: 1.6;
 }
 
 body {
-    max-width: 80ch;
+    max-width: 100ch;
     margin: 2rem auto;
     padding: 1rem;
 }
 
 h1, h2, h3, h4, h5, h6 {
     font-weight: bold;
-    /* text-transform: uppercase; */
     color: var(--border);
 }
 
@@ -49,12 +48,11 @@ button {
     font-family: var(--mono);
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
-    margin: 0.1rem;
 }
 
 button:hover {
     background: var(--border);
-    color: var(--bg);
+    color: var(--accent);
 }
 
 code, pre {

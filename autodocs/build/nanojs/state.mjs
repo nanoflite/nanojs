@@ -77,45 +77,30 @@ function findDepending(state) {
 function updateDepending(state) {
     if (dependingMap.has(state)) {
         const derives = dependingMap.get(state)
-        for (const derive of derives) {
-            queuedDerives.add(derive)
-        }
+        for (const derive of derives) queuedDerives.add(derive)
     }
     schedule(() => {
-        for (const derive of queuedDerives) {
-            derive()
-        }
+        for (const derive of queuedDerives) derive()
         queuedDerives.clear()
     })
 }
 
 function derive(fn) {
     const derived = state(fn())
-    watch(() => {
-        console.log(`watch`)
-        derived.value = fn()
-    })
+    watch(_ => derived.value = fn())
     return derived
 }
 
 async function change(state) {
     return new Promise(resolve => {
         const old = state.value
-        watch(() => {
-            if (state.value !== old) {
-                resolve(state.value)
-            }
-        })
+        watch(_ => (state.value !== old) && resolve(state.value))
     })
 }
 
 async function until(state, fn) {
     return new Promise(resolve => {
-        watch(() => {
-            if (fn(state.value)) {
-                resolve(state.value)
-            }
-        })
+        watch(_ => (fn(state.value)) && resolve(state.value))
     })
 }
 

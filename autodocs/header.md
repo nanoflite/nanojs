@@ -1,0 +1,7 @@
+# nJS - A nano sized reactive framework
+
+*nJS* is a lightweight framework designed to provide essential reactive programming features for web applications. Its minimalistic approach allows developers to efficiently manage state and DOM updates with simplicity and ease.
+
+These are interactive docs... enjoy
+
+---

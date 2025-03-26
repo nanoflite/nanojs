@@ -1,0 +1,237 @@
+<html lang="en">
+    <head>
+      <title>nJS - A nano sized reactive framework</title>
+      <link rel="stylesheet" href="nano.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/dark.min.css">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+      <script>hljs.highlightAll();</script>
+    </head>
+    <body>
+    <h1>nJS - A nano sized reactive framework</h1>
+
+<p><i>nJS</i> is a lightweight framework designed to provide essential reactive programming features for web applications. Its minimalistic approach allows developers to efficiently manage state and DOM updates with simplicity and ease.</p>
+
+<p>These are interactive docs... enjoy</p>
+
+<hr><h2>Hello World</h2>
+
+<p>Checkout this `Hello World` example in <i>nJS</i>. </p>
+<h4>code</h4><pre><code class="language-javascript">import { add, tags, S} from './nanojs/index.mjs'
+
+const { div, p } = tags()
+
+add(S('#helloworld'), div(p('Hello World!')))
+</code></pre><h4>example</h4><div id="helloworld" style="background:var(--accent);width:80ch;color:var(--bg);border:1px solid var(--border);padding:0.5rem 1rem;font-family:var(--mono);cursor:pointer;transition:background 0.2s, color 0.2s"></div><script type="module">import { add, tags, S} from './nanojs/index.mjs'
+
+const { div, p } = tags()
+
+add(S('#helloworld'), div(p('Hello World!')))
+</script><h2>Tags</h2>
+
+<p>Tags can be imported from the `tags` function, whereby each tag is a function that takes a list of other tags or text.</p>
+
+<p>There's a minimal selector function `S` available as well. Look at it as a replacement for the `$` fucntion in jQuery, but simpler.</p>
+
+<p>The `add` function can be used to add a list of (nested) children to a DOM element (e.g. `document.body`).</p><h4>code</h4><pre><code class="language-javascript">import {add, tags, S} from './nanojs/index.mjs'
+
+const { div, p, ul, li  } = tags()
+
+add(S('#tags'), div(p('Hello World!'), ul(li('a'), li('b'), li('c'))))
+</code></pre><h4>example</h4><div id="tags" style="background:var(--accent);width:80ch;color:var(--bg);border:1px solid var(--border);padding:0.5rem 1rem;font-family:var(--mono);cursor:pointer;transition:background 0.2s, color 0.2s"></div><script type="module">import {add, tags, S} from './nanojs/index.mjs'
+
+const { div, p, ul, li  } = tags()
+
+add(S('#tags'), div(p('Hello World!'), ul(li('a'), li('b'), li('c'))))
+</script><h2>State</h2>
+
+<p>State is simply defined as a call to the function `state`. The value of a state can be any primitive javascript type.</p>
+
+<p>You can access the value of state by using the `value` property.</p><h4>code</h4><pre><code class="language-javascript">import { tags, add, state, S } from './nanojs/index.mjs'
+
+const { div, p, button } = tags()
+
+const counter = state(0)
+
+add(S('#state'), div(
+    p("Counter: ", counter),
+    button({ onclick: () =&gt; counter.value++ }, 'inc'),
+    button({ onclick: () =&gt; counter.value-- }, 'dec')
+))</code></pre><h4>example</h4><div id="state" style="background:var(--accent);width:80ch;color:var(--bg);border:1px solid var(--border);padding:0.5rem 1rem;font-family:var(--mono);cursor:pointer;transition:background 0.2s, color 0.2s"></div><script type="module">import { tags, add, state, S } from './nanojs/index.mjs'
+
+const { div, p, button } = tags()
+
+const counter = state(0)
+
+add(S('#state'), div(
+    p("Counter: ", counter),
+    button({ onclick: () => counter.value++ }, 'inc'),
+    button({ onclick: () => counter.value-- }, 'dec')
+))</script><h2>Derived state</h2>
+
+<p>State can be derived from another state variable, using the `derive` function.</p>
+
+<h4>code</h4><pre><code class="language-javascript">import {tags, add, state, derive, S} from './nanojs/index.mjs'
+
+const { div, p, button } = tags()
+
+const counter = state(0)
+
+const square = derive(_ =&gt; counter.value * counter.value)
+
+add(S('#derived'), div(
+    p("Counter: ", counter),
+    p("Square: ", square),
+    button({ onclick: () =&gt; counter.value++ }, 'inc'),
+    button({ onclick: () =&gt; counter.value-- }, 'dec')
+))</code></pre><h4>example</h4><div id="derived" style="background:var(--accent);width:80ch;color:var(--bg);border:1px solid var(--border);padding:0.5rem 1rem;font-family:var(--mono);cursor:pointer;transition:background 0.2s, color 0.2s"></div><script type="module">import {tags, add, state, derive, S} from './nanojs/index.mjs'
+
+const { div, p, button } = tags()
+
+const counter = state(0)
+
+const square = derive(_ => counter.value * counter.value)
+
+add(S('#derived'), div(
+    p("Counter: ", counter),
+    p("Square: ", square),
+    button({ onclick: () => counter.value++ }, 'inc'),
+    button({ onclick: () => counter.value-- }, 'dec')
+))</script><h2>A property can depend on state</h2>
+
+<p>You can set the value of a property to a state variable.</p>
+
+<h4>code</h4><pre><code class="language-javascript">import {tags, add, state, S} from './nanojs/index.mjs'
+
+const { div, p, input, button } = tags()
+
+const counter = state(0)
+
+add(S('#stateproperty'), div(
+    p("Counter: ", counter),
+    input({type: "number", value: counter, disabled: true}),
+    button({ onclick: () =&gt; counter.value++ }, 'inc'),
+    button({ onclick: () =&gt; counter.value-- }, 'dec')
+))</code></pre><h4>example</h4><div id="stateproperty" style="background:var(--accent);width:80ch;color:var(--bg);border:1px solid var(--border);padding:0.5rem 1rem;font-family:var(--mono);cursor:pointer;transition:background 0.2s, color 0.2s"></div><script type="module">import {tags, add, state, S} from './nanojs/index.mjs'
+
+const { div, p, input, button } = tags()
+
+const counter = state(0)
+
+add(S('#stateproperty'), div(
+    p("Counter: ", counter),
+    input({type: "number", value: counter, disabled: true}),
+    button({ onclick: () => counter.value++ }, 'inc'),
+    button({ onclick: () => counter.value-- }, 'dec')
+))</script><h2>A property can be derived from state</h2>
+
+<p>If we set the value of a property to be a function, we can use derived state as the value of that property.</p>
+<h4>code</h4><pre><code class="language-javascript">import {tags, add, state, S} from './nanojs/index.mjs'
+
+const { div, p, button } = tags()
+
+const counter = state(0)
+
+add(S('#statederivedproperty'), div(
+    p("Counter: ", counter),
+    button({ onclick: () =&gt; counter.value++ }, 'inc'),
+    button({ onclick: () =&gt; counter.value-- }, 'dec'),
+    p({style: () =&gt; `font-size: ${8 + counter.value}pt;`}, "Hello!")
+))
+</code></pre><h4>example</h4><div id="statederivedproperty" style="background:var(--accent);width:80ch;color:var(--bg);border:1px solid var(--border);padding:0.5rem 1rem;font-family:var(--mono);cursor:pointer;transition:background 0.2s, color 0.2s"></div><script type="module">import {tags, add, state, S} from './nanojs/index.mjs'
+
+const { div, p, button } = tags()
+
+const counter = state(0)
+
+add(S('#statederivedproperty'), div(
+    p("Counter: ", counter),
+    button({ onclick: () => counter.value++ }, 'inc'),
+    button({ onclick: () => counter.value-- }, 'dec'),
+    p({style: () => `font-size: ${8 + counter.value}pt;`}, "Hello!")
+))
+</script><h2>Derived child node</h2>
+
+<p>A child node can be a derived state variable. Alternatively, we can use a function as a child node.</p>
+<h4>code</h4><pre><code class="language-javascript">import {tags, add, state, derive, S} from './nanojs/index.mjs'
+
+const { div, button, sup } = tags()
+
+const counter = state(0)
+const square = derive(_ =&gt; Math.pow(counter.value, 2))
+
+add(S('#statederivedchild'), div(
+    div(counter, sup(2), ' = ', square),
+    div(square, sup(3), ' = ', () =&gt; Math.pow(square.value, 3)),
+    button({ onclick: () =&gt; counter.value++ }, 'inc'),
+    button({ onclick: () =&gt; counter.value-- }, 'dec'),
+))
+</code></pre><h4>example</h4><div id="statederivedchild" style="background:var(--accent);width:80ch;color:var(--bg);border:1px solid var(--border);padding:0.5rem 1rem;font-family:var(--mono);cursor:pointer;transition:background 0.2s, color 0.2s"></div><script type="module">import {tags, add, state, derive, S} from './nanojs/index.mjs'
+
+const { div, button, sup } = tags()
+
+const counter = state(0)
+const square = derive(_ => Math.pow(counter.value, 2))
+
+add(S('#statederivedchild'), div(
+    div(counter, sup(2), ' = ', square),
+    div(square, sup(3), ' = ', () => Math.pow(square.value, 3)),
+    button({ onclick: () => counter.value++ }, 'inc'),
+    button({ onclick: () => counter.value-- }, 'dec'),
+))
+</script><h2>Execute code when state changes</h2>
+
+<p>There are 3 ways to execute code when state changes: `watch`, `derive` and `change`.</p>
+
+<p>We already discussed `derive`, which return a new state that depends on another state.</p><h3>watch</h3>
+
+<p>Watch works like derive, but does not return a state. It can be used to run a piece of code anytime a state is assigned a value.</p>
+
+<p>The `setTimeout` in the alert watcher is necessary to let the UI update before the alert is shown.</p><h4>code</h4><pre><code class="language-javascript">import {tags, add, state, watch, S} from './nanojs/index.mjs'
+
+const { div, p, button } = tags()
+
+const counter = state(0)
+
+watch(() =&gt; {
+    if (counter.value === 3) {
+        setTimeout(() =&gt; alert(`Counter reached 3!`), 0)
+    }
+})
+
+watch(() =&gt; {
+    console.log(`Counter: ${counter.value}`)
+})
+
+add(S('#watch'), div(
+    p("Counter: ", counter),
+    p("(increment till 3)"),
+    button({ onclick: () =&gt; counter.value++ }, 'inc'),
+    button({ onclick: () =&gt; counter.value-- }, 'dec'),
+))</code></pre><h4>example</h4><div id="watch" style="background:var(--accent);width:80ch;color:var(--bg);border:1px solid var(--border);padding:0.5rem 1rem;font-family:var(--mono);cursor:pointer;transition:background 0.2s, color 0.2s"></div><script type="module">import {tags, add, state, watch, S} from './nanojs/index.mjs'
+
+const { div, p, button } = tags()
+
+const counter = state(0)
+
+watch(() => {
+    if (counter.value === 3) {
+        setTimeout(() => alert(`Counter reached 3!`), 0)
+    }
+})
+
+watch(() => {
+    console.log(`Counter: ${counter.value}`)
+})
+
+add(S('#watch'), div(
+    p("Counter: ", counter),
+    p("(increment till 3)"),
+    button({ onclick: () => counter.value++ }, 'inc'),
+    button({ onclick: () => counter.value-- }, 'dec'),
+))</script><hr>
+
+<p>(c) 2025 - JVdB</p><script type="module">import { S } from './nanojs/index.mjs'
+
+console.log(S('h2'))</script></body>
+  </html>
