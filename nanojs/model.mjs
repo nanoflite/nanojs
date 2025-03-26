@@ -31,9 +31,7 @@ const toJsonProto = {
 }
 
 function model(obj) {
-    if (typeof obj !== 'object' || obj === null) {
-        throw new Error('model: argument must be an object')
-    }
+    if (typeof obj !== 'object' || obj === null) throw new Error('model: argument must be an object')
 
     function wrap(obj, path = '') {
         const mobj = {}

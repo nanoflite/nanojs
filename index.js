@@ -1,279 +1,355 @@
-import { state, derive, tags, add, router, sleep, component } from './nanojs'
+import { tags, add, html, state, states, watch, derive, change, until, sleep, schedule, css, S, router, model, component, style } from './nanojs/index.mjs'
+const { div, p, ul, li, h4, pre, code, button, input, sup } = tags()
 
-const { h1, h2, div, button, input, sup, hr, span, a, li, ul } = tags()
-const { svg, circle } = tags('http://www.w3.org/2000/svg')
-const { math, mfrac, mi, mn, mo, mrow, msqrt, msup } = tags('http://www.w3.org/1998/Math/MathML')
+// ./header.md
+add(document.body, html(`<h1>nJS - A nano sized reactive framework</h1>
+<p><em>nJS</em> is a lightweight framework designed to provide essential reactive programming features for web applications. Its minimalistic approach allows developers to efficiently manage state and DOM updates with simplicity and ease.</p>
+<p>These are interactive docs... enjoy</p>
+<hr>
+`))
+
+
+// helloworld
+const Helloworld = () => 
+  div(
+    html(`<h2>Hello World</h2>
+<p>Checkout this <code>Hello World</code> example in <em>nJS</em>. </p>
+`),
+  
+    h4('code'),
+    pre(code({class: 'language-javascript'}, `import { add, tags, S} from './nanojs/index.mjs'
+
+const { div, p } = tags()
+
+add(S('#helloworld'), div(p('Hello World!')))
+`)),
+    h4('result'),
+    div({id: 'helloworld', class: 'example'})
+      
+  )
+  add(document.body, Helloworld())
+  
+
+;( () => {
+
+add(S('#helloworld'), div(p('Hello World!')))
+
+} )()
+
+
+// tags
+const Tags = () => 
+  div(
+    html(`<h2>Tags</h2>
+<p>Tags can be imported from the <code>tags</code> function, whereby each tag is a function that takes a list of other tags or text.</p>
+<p>There&#39;s a minimal selector function <code>S</code> available as well. Look at it as a replacement for the <code>\$</code> fucntion in jQuery, but simpler.</p>
+<p>The <code>add</code> function can be used to add a list of (nested) children to a DOM element (e.g. <code>document.body</code>).</p>
+`),
+  
+    h4('code'),
+    pre(code({class: 'language-javascript'}, `import {add, tags, S} from './nanojs/index.mjs'
+
+const { div, p, ul, li  } = tags()
+
+add(S('#tags'), div(p('Hello World!'), ul(li('a'), li('b'), li('c'))))
+`)),
+    h4('result'),
+    div({id: 'tags', class: 'example'})
+      
+  )
+  add(document.body, Tags())
+  
+
+;( () => {
+
+add(S('#tags'), div(p('Hello World!'), ul(li('a'), li('b'), li('c'))))
+
+} )()
+
+
+// state
+const State = () => 
+  div(
+    html(`<h2>State</h2>
+<p>State is simply defined as a call to the function <code>state</code>. The value of a state can be any primitive javascript type.</p>
+<p>You can access the value of state by using the <code>value</code> property.</p>
+`),
+  
+    h4('code'),
+    pre(code({class: 'language-javascript'}, `import { tags, add, state, S } from './nanojs/index.mjs'
+
+const { div, p, button } = tags()
 
 const counter = state(0)
+
+add(S('#state'), div(
+    p("Counter: ", counter),
+    button({ onclick: () => counter.value++ }, 'inc'),
+    button({ onclick: () => counter.value-- }, 'dec')
+))`)),
+    h4('result'),
+    div({id: 'state', class: 'example'})
+      
+  )
+  add(document.body, State())
+  
+
+;( () => {
+
+const counter = state(0)
+
+add(S('#state'), div(
+    p("Counter: ", counter),
+    button({ onclick: () => counter.value++ }, 'inc'),
+    button({ onclick: () => counter.value-- }, 'dec')
+))
+} )()
+
+
+// derived
+const Derived = () => 
+  div(
+    html(`<h2>Derived state</h2>
+<p>State can be derived from another state variable, using the <code>derive</code> function.</p>
+`),
+  
+    h4('code'),
+    pre(code({class: 'language-javascript'}, `import {tags, add, state, derive, S} from './nanojs/index.mjs'
+
+const { div, p, button } = tags()
+
+const counter = state(0)
+
 const square = derive(_ => counter.value * counter.value)
 
-derive(() => console.log("Counter: ", counter.value))
+add(S('#derived'), div(
+    p("Counter: ", counter),
+    p("Square: ", square),
+    button({ onclick: () => counter.value++ }, 'inc'),
+    button({ onclick: () => counter.value-- }, 'dec')
+))`)),
+    h4('result'),
+    div({id: 'derived', class: 'example'})
+      
+  )
+  add(document.body, Derived())
+  
 
-const menu = [ '#home', '#example', '#derived-state', '#timer/5', "#listdemo", "#test", "#component", "#svg", '#math' ]
+;( () => {
 
-const Menu = (menu) => {
-    return div(
-        hr(),
-        menu.flatMap(path => [ a({href: path}, path.slice(1).split('/')[0]), span(' | ') ]).slice(0, -1),
-        hr()
-    )
-}
+const counter = state(0)
 
-const Header = (page) => div(
-    h1("nanojs ~ a nano size reactive framework"),
-    Menu(menu),
-    h2(page)
-)
+const square = derive(_ => counter.value * counter.value)
 
-const Home = () => div(
-    Header('home'),
-    div(
-        `Welcome to nanojs! A minimal reactive framework for building web apps.`
-    )
-)
+add(S('#derived'), div(
+    p("Counter: ", counter),
+    p("Square: ", square),
+    button({ onclick: () => counter.value++ }, 'inc'),
+    button({ onclick: () => counter.value-- }, 'dec')
+))
+} )()
 
-const App = () => div(
-    Header('example'),
-    div(
-        h2('state'),
-        div("counter: ", counter),
-        h2('derived state'),
-        div("square:", counter, sup(2),'=', square),
-        h2('property'),
-        input({type: "number", value: _ => counter.value, disabled: true}),
-        h2('state-derived property'),
-        div({style: () => `font-size: ${8 + counter.value}px;`}, "Hello"),
-        h2('state-derived child'),
-        div(counter, sup(2), () => ` = ${square.value}`),
-        hr(),
-        button({ onclick: () => counter.value++ }, 'inc'),
-        button({ onclick: () => counter.value-- }, 'dec'),
-        button({ onclick: () => counter.value = 0 }, 'reset')
-    )
-)
 
-const DerivedState = () => {
-    const text = state("n, nanoJS")
-    const length = derive(() => text.value.length)
-    return div(
-        Header('derived state'),
-        span(
-            "The length of ",
-            input({type: "text", value: text, oninput: e => text.value = e.target.value}),
-            " is ", length, ".",
-        )
-    )
-}
+// stateproperty
+const Stateproperty = () => 
+  div(
+    html(`<h2>A property can depend on state</h2>
+<p>You can set the value of a property to a state variable.</p>
+`),
+  
+    h4('code'),
+    pre(code({class: 'language-javascript'}, `import {tags, add, state, S} from './nanojs/index.mjs'
 
-const Timer = ({totalSecs}) => {
-    const secs = state(totalSecs)
-    return div(
-        Header('async example'),
-        span(' rocket launch in:', secs, "s ",
-        button({onclick: async () => {
-                while (secs.value > 0) {
-                    await sleep(1000)
-                    --secs.value
-                }
-                await sleep(10) // Wait briefly for DOM update
-                alert("Launch 🚀")
-                secs.value = totalSecs
-            }}, "Start")
-        )
-    )
-}
+const { div, p, input, button } = tags()
 
-const ListDemo = () => {
+const counter = state(0)
 
-    const item = ({text}) => {
-        const deleted = state(false)
-        return () => deleted.value
-                                    ? null
-                                    : li(text, a({href: '', onclick: (e) => {e.preventDefault(); deleted.value = true}}, " [remove]"))
+add(S('#stateproperty'), div(
+    p("Counter: ", counter),
+    input({type: "number", value: counter, disabled: true}),
+    button({ onclick: () => counter.value++ }, 'inc'),
+    button({ onclick: () => counter.value-- }, 'dec')
+))`)),
+    h4('result'),
+    div({id: 'stateproperty', class: 'example'})
+      
+  )
+  add(document.body, Stateproperty())
+  
+
+;( () => {
+
+const counter = state(0)
+
+add(S('#stateproperty'), div(
+    p("Counter: ", counter),
+    input({type: "number", value: counter, disabled: true}),
+    button({ onclick: () => counter.value++ }, 'inc'),
+    button({ onclick: () => counter.value-- }, 'dec')
+))
+} )()
+
+
+// statederivedproperty
+const Statederivedproperty = () => 
+  div(
+    html(`<h2>A property can be derived from state</h2>
+<p>If we set the value of a property to be a function, we can use derived state as the value of that property.</p>
+`),
+  
+    h4('code'),
+    pre(code({class: 'language-javascript'}, `import {tags, add, state, S} from './nanojs/index.mjs'
+
+const { div, p, button } = tags()
+
+const counter = state(0)
+
+add(S('#statederivedproperty'), div(
+    p("Counter: ", counter),
+    button({ onclick: () => counter.value++ }, 'inc'),
+    button({ onclick: () => counter.value-- }, 'dec'),
+    p({style: () => \`font-size: \${8 + counter.value}pt;\`}, "Hello!")
+))
+`)),
+    h4('result'),
+    div({id: 'statederivedproperty', class: 'example'})
+      
+  )
+  add(document.body, Statederivedproperty())
+  
+
+;( () => {
+
+const counter = state(0)
+
+add(S('#statederivedproperty'), div(
+    p("Counter: ", counter),
+    button({ onclick: () => counter.value++ }, 'inc'),
+    button({ onclick: () => counter.value-- }, 'dec'),
+    p({style: () => `font-size: ${8 + counter.value}pt;`}, "Hello!")
+))
+
+} )()
+
+
+// statederivedchild
+const Statederivedchild = () => 
+  div(
+    html(`<h2>Derived child node</h2>
+<p>A child node can be a derived state variable. Alternatively, we can use a function as a child node.</p>
+`),
+  
+    h4('code'),
+    pre(code({class: 'language-javascript'}, `import {tags, add, state, derive, S} from './nanojs/index.mjs'
+
+const { div, button, sup } = tags()
+
+const counter = state(0)
+const square = derive(_ => Math.pow(counter.value, 2))
+
+add(S('#statederivedchild'), div(
+    div(counter, sup(2), ' = ', square),
+    div(square, sup(3), ' = ', () => Math.pow(square.value, 3)),
+    button({ onclick: () => counter.value++ }, 'inc'),
+    button({ onclick: () => counter.value-- }, 'dec'),
+))
+`)),
+    h4('result'),
+    div({id: 'statederivedchild', class: 'example'})
+      
+  )
+  add(document.body, Statederivedchild())
+  
+
+;( () => {
+
+const counter = state(0)
+const square = derive(_ => Math.pow(counter.value, 2))
+
+add(S('#statederivedchild'), div(
+    div(counter, sup(2), ' = ', square),
+    div(square, sup(3), ' = ', () => Math.pow(square.value, 3)),
+    button({ onclick: () => counter.value++ }, 'inc'),
+    button({ onclick: () => counter.value-- }, 'dec'),
+))
+
+} )()
+
+
+// change
+const Change = () => 
+  div(
+    html(`<h2>Execute code when state changes</h2>
+<p>There are 3 ways to execute code when state changes: <code>watch</code>, <code>derive</code> and <code>change</code>.</p>
+<p>We already discussed <code>derive</code>, which return a new state that depends on another state.</p>
+`),
+  
+  )
+  add(document.body, Change())
+  
+
+
+// watch
+const Watch = () => 
+  div(
+    html(`<h3>watch</h3>
+<p>Watch works like derive, but does not return a state. It can be used to run a piece of code anytime a state is assigned a value.</p>
+<p>The <code>setTimeout</code> in the alert watcher is necessary to let the UI update before the alert is shown.</p>
+`),
+  
+    h4('code'),
+    pre(code({class: 'language-javascript'}, `import {tags, add, state, watch, S} from './nanojs/index.mjs'
+
+const { div, p, button } = tags()
+
+const counter = state(0)
+
+watch(() => {
+    if (counter.value === 3) {
+        setTimeout(() => alert(\`Counter reached 3!\`), 0)
     }
+})
 
-    const list = ul({ type: 'square'})
-    const text = input({type: "text"})
-    return div(
-        Header('todo'),
-        div(
-        "add item: ",
-        text,
-        " ",
-        button(
-            {
-                onclick: () => {
-                    const todo = item({text: text.value})
-                    return add(list, todo)
-                }
-            },
-            "add"),
-        list
-        )
-    )
-}
+watch(() => {
+    console.log(\`Counter: \${counter.value}\`)
+})
 
-const Test = () => {
-    const item = (text) => {
-        const deleted = state(false)
-        return () => deleted.value
-            ? null
-            : li(text, a({href: '', onclick: (e) => {e.preventDefault(); deleted.value = true}}, " [remove]"))
+add(S('#watch'), div(
+    p("Counter: ", counter),
+    p("(increment till 3)"),
+    button({ onclick: () => counter.value++ }, 'inc'),
+    button({ onclick: () => counter.value-- }, 'dec'),
+))`)),
+    h4('result'),
+    div({id: 'watch', class: 'example'})
+      
+  )
+  add(document.body, Watch())
+  
+
+;( () => {
+
+const counter = state(0)
+
+watch(() => {
+    if (counter.value === 3) {
+        setTimeout(() => alert(`Counter reached 3!`), 0)
     }
-    return div(
-        Header('test'),
-        div(
-            ul({ type: 'square'},
-                item('A'),
-                item('B'),
-                item('C'),
-                item('D'),
-                item('E'),
-                item('F'),
-                item('G'),
-                item('H'),
-                item('I'),
-                item('J'),
-                item('K')
-            )
-        )
-    )
-}
+})
 
-const Component = () => {
-    const zero = component('nano-zero')
-    const one = component('nano-one', (args) => h1(`I am ${args.name} component!`))
-    const app = component('nano-app', (args) => {
-        const start = args.start || 0
-        const counter = state(start)
-        return div(
-            "counter: ", counter, button({onclick: () => counter.value++}, "inc"), button({onclick: () => counter.value--}, "dec")
-        )
-    })
-    return div(
-        Header('component'),
-        div(
-            zero(),
-            one({name: 'one'}),
-            one({name: 'two'}),
-            app(),
-            app(13)
-        )
-    )
-}
+watch(() => {
+    console.log(`Counter: ${counter.value}`)
+})
 
-const beat = (r, m, M) => {
-    const R = state(r)
-    let d = 1
-    setInterval(()=>{
-        if (R.value + d > M || R.value + d < m) d = -1 * d
-        R.value += d
-    }, 20)
-    return R
-}
+add(S('#watch'), div(
+    p("Counter: ", counter),
+    p("(increment till 3)"),
+    button({ onclick: () => counter.value++ }, 'inc'),
+    button({ onclick: () => counter.value-- }, 'dec'),
+))
+} )()
 
-const Svg = () => {
-    const colors = ['red', 'green', 'blue']
-    const color = state(0)
-    return div(
-        Header('svg'),
-        div(
-            svg(
-                circle({ cx: 60, cy: 60, r: beat(50, 40, 60), fill: _ => colors[color.value] })
-            )
-        ),
-        div(
-            button({onclick: () => {
-                color.value = ++color.value % colors.length
-            }}, "change color")
-        )
-    )
-}
-
-const Math = () => div(
-    Header('math'),
-    div(
-        math({ display: "block" },
-            mrow(
-                mi(
-                    "x",
-                ),
-                mo(
-                    "=",
-                ),
-                mfrac(
-                    mrow(
-                        mrow(
-                            mo(
-                                "−",
-                            ),
-                            mi(
-                                "b",
-                            ),
-                        ),
-                        mo(
-                            "±",
-                        ),
-                        msqrt(
-                            mrow(
-                                msup(
-                                    mi(
-                                        "b",
-                                    ),
-                                    mn(
-                                        "2",
-                                    ),
-                                ),
-                                mo(
-                                    "−",
-                                ),
-                                mrow(
-                                    mn(
-                                        "4",
-                                    ),
-                                    mo(
-                                        "⁢",
-                                    ),
-                                    mi(
-                                        "a",
-                                    ),
-                                    mo(
-                                        "⁢",
-                                    ),
-                                    mi(
-                                        "c",
-                                    ),
-                                ),
-                            ),
-                        ),
-                    ),
-                    mrow(
-                        mn(
-                            "2",
-                        ),
-                        mo(
-                            "⁢",
-                        ),
-                        mi(
-                            "a",
-                        ),
-                    ),
-                ),
-            ),
-        )
-
-    )
-)
-
-router([
-    ['#home', Home],
-    ['#example', App],
-    ['#derived-state', DerivedState],
-    ['#timer/:totalSecs', Timer],
-    ['#listdemo', ListDemo],
-    ['#test', Test],
-    ['#component', Component],
-    ['#svg', Svg],
-    ['#math', Math]
-])
-
+// footer.md
+add(document.body, html(`<hr>
+<p>(c) 2025 - JVdB</p>
+`))

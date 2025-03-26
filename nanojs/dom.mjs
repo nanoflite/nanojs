@@ -17,7 +17,7 @@ function getDom(elt) {
         ? elt
         : isFun(elt)
             ? getDom(elt())
-            : new Text(elt)
+            : document.createTextNode(elt) // new Text(elt)
 }
 
 function add(dom, ...children)  {
@@ -66,7 +66,7 @@ function tags(namespace) {
                             elt.addEventListener(prop.slice(2).toLowerCase(), value)
                         } else if (isFun(value)) {
                             watch(() => {
-                                elt.setAttribute(prop, value())
+                                elt.setAttribute(prop, value(elt, prop))
                             })
                         } else if (isState(value)) {
                             watch(() => {
@@ -82,4 +82,8 @@ function tags(namespace) {
         })
 }
 
-export { tags, add }
+function html(text) {
+    return document.createRange().createContextualFragment(text)
+}
+
+export { tags, add, html }
