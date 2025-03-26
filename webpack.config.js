@@ -6,5 +6,12 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'nano.mjs',
+        module: true,  // <-- Important: Output an ES module
+        library: {
+            type: 'module' // <-- Important: Enables exporting your modules
+        }
     },
-};
+    experiments: {
+        outputModule: true // <-- Required to enable ESM output
+    }
+}
