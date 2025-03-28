@@ -1,15 +1,15 @@
 import { add, tags, state, states, sleep, watch, change, S } from "../nanojs/index.mjs"
-
 const { span, div, h1, button } = tags()
 
 const gamestate = states()
-const { score, timer, showscore, moles, running, lastwacked } = gamestate(0, 15, false, new Array(9).fill(false), false, -1)
+const { score, timer, showscore, moles, running, lastwacked, high } =
+    gamestate(0, 15, false, new Array(9).fill(false), false, -1, localStorage.getItem('high') || 0)
 
-const high = state(localStorage.getItem('high') || 0)
 watch( _ => { if (score.value > high.value) high.value = score.value, localStorage.setItem('high', high.value) })
 
-const mole = (i) => div({ class: 'mole', onclick: _ =>
-        {
+const mole = (i) =>
+    div({ class: 'mole',
+        onclick: _ => {
             if (running.value && lastwacked.value !== i && moles.value[i]) score.value++
             lastwacked.value = i
         }
