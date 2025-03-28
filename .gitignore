@@ -1,4 +1,3 @@
 .idea
 /node_modules/
-/dist/nano.mjs
 /autodocs/build/
