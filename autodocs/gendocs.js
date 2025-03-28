@@ -40,7 +40,7 @@ append_target(`import { tags, add, html, state, states, watch, derive, change, u
 append_target(`const { span, a, hr, div, p, ul, li, h1, h2, h3, h4, pre, code, button, input, sup, script } = tags()\n`)
 
 append_target(`
-const menu = [ '#home', '#docs', '#github' ]
+const menu = [ '#home', '#docs', '#source' ]
 
 const Menu = (menu) => {
     return div(
@@ -64,9 +64,9 @@ const Home = () => div(
   Footer()
 )
   
-const Github = () => div(
+const Source = () => div(
   Header(),
-  a({href: 'https://github.com/nanoflite/nanojs'}, 'github'),
+  html(\`${get_md_as_html('source.md')}\`),
   Footer()
 )
 
@@ -89,7 +89,7 @@ for (const snippet of snippets) {
   const js = fs.readFileSync(snippet, 'utf8')
   append_target(`\texamples[${i}] = {}\n`)
   append_target(`\texamples[${i}]['id'] = '${id}'\n`)
-  append_target(`\texamples[${i}]['js'] = \`${escape(js.split('\n').slice(3).join('\n'))}\`\n`)
+  append_target(`\texamples[${i}]['js'] = \`${escape(js.split('\n').slice(4).join('\n'))}\`\n`)
   append_target(`\texamples[${i}]['html'] = \`${body}\`\n`)
   append_target(`\texamples[${i}]['name'] = '${name}'\n`)
   i++
@@ -119,7 +119,7 @@ append_target(`
 router([
     ['#home', Home],
     ['#docs', Docs],
-    ['#github', Github]
+    ['#source', Source]
   ]
 )
 

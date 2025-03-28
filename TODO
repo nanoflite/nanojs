@@ -2,8 +2,9 @@
 
   * [v] Create site on gh
   * [v] Move examples to own folder
-  * [v] Write docs
+  * [v] Write docs (WIP)
   * [ ] Document all methods with example
   * [v] Edit README, point to docs for more information instead of explaining in README
   * [ ] Docs needs to have Home page (readme.md + whackamole example), Docs, Github link and About
+  * [ ] Add CDN and CDN example (add to homepage)
   * [ ] Add nanoconfig to docs in own menu item
