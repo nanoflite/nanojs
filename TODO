@@ -4,6 +4,6 @@
   * [v] Move examples to own folder
   * [v] Write docs
   * [ ] Document all methods with example
-  * [ ] Edit README, point to docs for more information instead of explaining in README
+  * [v] Edit README, point to docs for more information instead of explaining in README
   * [ ] Docs needs to have Home page (readme.md + whackamole example), Docs, Github link and About
   * [ ] Add nanoconfig to docs in own menu item
