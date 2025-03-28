@@ -5,7 +5,7 @@ module.exports = {
     entry: path.resolve(__dirname, 'nanojs', 'index.mjs'),
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'nano.mjs',
+        filename: 'nanojs.mjs',
         module: true,  // <-- Important: Output an ES module
         library: {
             type: 'module' // <-- Important: Enables exporting your modules
