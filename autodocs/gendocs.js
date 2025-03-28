@@ -1,13 +1,3 @@
-// TODO:
-//  v copy test.html as the index.html
-//  v copy nanojs/*, nano.css on build
-//  v generate build/index.js
-//  v nodemon --> watch
-//  v gendocs2 --> gendocs
-//  generate menu + router (home (mole?), docs, about, link to github)
-//  v use another md converter (marked)
-//  v prettier on output
-
 const fs = require('fs')
 const path = require('path')
 const marked = require('marked')
@@ -29,9 +19,14 @@ const append_target = (txt) => {
 
 const escape = (txt) => txt.replaceAll('`', '\\`').replaceAll('$', '\\$')
 
-const add_md = (filename) => {
+const get_md_as_html = (filename) => {
   const md = fs.readFileSync(path.join(docs, filename), 'utf8')
   const body = escape(marked.parse(md))
+  return body
+}
+
+const add_md = (filename) => {
+  const body = get_md_as_html(filename)
   append_target(`\n// ${filename}\nadd(document.body, html(\`${body}\`))\n`)
 }
 
@@ -42,39 +37,91 @@ shell.cp(path.join(root, 'style', 'nano.css'), build_folder)
 shell.cp(path.join(__dirname, 'index.html'), build_folder)
 
 append_target(`import { tags, add, html, state, states, watch, derive, change, until, sleep, schedule, css, S, router, model, component, style } from './nanojs/index.mjs'\n`)
-append_target(`const { div, p, ul, li, h4, pre, code, button, input, sup } = tags()\n`)
-add_md('./header.md')
+append_target(`const { span, a, hr, div, p, ul, li, h1, h2, h3, h4, pre, code, button, input, sup, script } = tags()\n`)
 
+append_target(`
+const menu = [ '#home', '#docs', '#github' ]
+
+const Menu = (menu) => {
+    return div(
+        menu.flatMap(path => [ a({href: path}, path.slice(1).split('/')[0]), span(' | ') ]).slice(0, -1),
+        hr()
+    )
+}
+
+const Header = () => div(
+  h1('nJS - A nano sized reactive framework'),
+  Menu(menu)
+)
+
+const Footer = () => div(
+  html(\`${get_md_as_html('footer.md')}\`)
+)
+
+const Home = () => div(
+  Header(),
+  html(\`${get_md_as_html('header.md')}\`),
+  Footer()
+)
+  
+const Github = () => div(
+  Header(),
+  a({href: 'https://github.com/nanoflite/nanojs'}, 'github'),
+  Footer()
+)
+
+`)
+
+append_target(`
+
+const Docs = () => {
+  const examples = []
+`)
+
+let i = 0
 const snippets = fs.globSync(path.join(snippets_folder, '*.js')).sort()
+const fns = []
 for (const snippet of snippets) {
   const id = snippet.split('_').pop().replace('.js', '')
-
   const name = id.charAt(0).toUpperCase() + id.slice(1)
   const md = fs.readFileSync(snippet.replace('.js', '.md'), 'utf8')
   const body = escape(marked.parse(md))
   const js = fs.readFileSync(snippet, 'utf8')
-
-  append_target(`\n
-// ${id}
-const ${name} = () => 
-  div(
-    html(\`${body}\`),
-  `)
-  if (js !== "") {
-      append_target(`
-    h4('code'),
-    pre(code({class: 'language-javascript'}, \`${escape(js)}\`)),
-    h4('result'),
-    div({id: '${id}', class: 'example'})
-      `)
-  }
-  append_target(`
-  )
-  add(document.body, ${name}())
-  \n`)
-  if (js !== "") {
-      append_target(`\n;( () => {\n${js.split('\n').slice(3).join('\n')}\n} )()\n`)
-  }
+  append_target(`\texamples[${i}] = {}\n`)
+  append_target(`\texamples[${i}]['id'] = '${id}'\n`)
+  append_target(`\texamples[${i}]['js'] = \`${escape(js.split('\n').slice(3).join('\n'))}\`\n`)
+  append_target(`\texamples[${i}]['html'] = \`${body}\`\n`)
+  append_target(`\texamples[${i}]['name'] = '${name}'\n`)
+  i++
 }
 
-add_md('footer.md')
+append_target(`
+  const output = []
+  for (const example of examples) {
+    output.push(
+      div(
+        html(example['html']),
+        h4('code'),
+        pre(code({class: 'language-javascript'}, example['js'])),
+        h4('result'),
+        div({id: example['id'], class: 'example'})
+      )
+    ) 
+  }
+  setTimeout(() => {
+    for (const example of examples) {
+      eval(example['js'])
+    }
+  })
+  return div(Header(), ...output, Footer())
+}
+
+router([
+    ['#home', Home],
+    ['#docs', Docs],
+    ['#github', Github]
+  ]
+)
+
+
+`)
