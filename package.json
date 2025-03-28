@@ -9,7 +9,8 @@
     "docs:build": "make docs",
     "docs:watch": "nodemon --watch autodocs --ignore autodocs/build --exec npm run docs:build",
     "docs:serve": "npx http-server ./autodocs/build",
-    "docs:deploy": "npm run docs:build && gh-pages -d autodocs/build -b gh"
+    "docs:deploy": "npm run docs:build && gh-pages -d autodocs/build -b gh",
+    "cdn:deploy": "make cdn"
   },
   "private": true,
   "author": "Johan Van den Brande",
