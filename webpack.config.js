@@ -18,7 +18,7 @@ module.exports = {
     plugins: [
         new CopyPlugin({
             patterns: [
-                { from: 'style/nano.css', to: 'dist/nano.css' }
+                { from: 'style/nano.css', to: 'nano.css' }
             ]
         })
     ]
