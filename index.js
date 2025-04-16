@@ -1,7 +1,7 @@
 import { tags, add, html, state, states, watch, derive, change, until, sleep, schedule, css, S, router, model, component, style } from './nanojs/index.mjs'
-const { span, a, hr, div, p, ul, li, h1, h2, h3, h4, pre, code, button, input, sup, script } = tags()
+const { span, a, hr, div, p, ul, li, h1, h2, h3, h4, pre, code, button, input, sup, script, iframe } = tags()
 
-const menu = [ '#home', '#docs', '#github' ]
+const menu = [ '#home', '#docs', '#source' ]
 
 const Menu = (menu) => {
     return div(
@@ -15,22 +15,68 @@ const Header = () => div(
   Menu(menu)
 )
 
-const Footer = () => div(
-  html(`<hr>
-<p>(c) 2025 - JVdB</p>
-`)
-)
+const Footer = () => {
+  setTimeout(_ => hljs.highlightAll(), 0)
+  return div(html(`<hr>
+<p>(c) 2024 - 2025 - JVdB</p>
+`))
+}
 
 const Home = () => div(
   Header(),
-  html(`<p><em>nJS</em> is a lightweight framework designed to provide essential reactive programming features for web applications. Its minimalistic approach allows developers to efficiently manage state and DOM updates with simplicity and ease.</p>
+  html(`<p><strong>nanojs</strong> is a lightweight, functional framework for building reactive web applications.</p>
+<h2>Features</h2>
+<ul>
+<li>Zero build step</li>
+<li>Reactive state management</li>
+<li>Declarative DOM creation and updates</li>
+<li>Utilities like <code>sleep</code>, <code>schedule</code>, <code>S()</code> selector, and more</li>
+</ul>
+<h2>Example</h2>
 `),
+  pre(code(`<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>nJS example</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/nanoflite/nanojs@latest/nanojs.css"/>
+</head>
+<body>
+<script type="module">
+    import { add, tags } from 'https://cdn.jsdelivr.net/gh/nanoflite/nanojs@latest/nanojs.mjs'
+    const { h1 } = tags()
+    add(document.body, h1('Hello World!'))
+</script>
+</body>
+</html>`)),
+  iframe({srcdoc: `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>nJS example</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/nanoflite/nanojs@latest/nanojs.css"/>
+</head>
+<body>
+<script type="module">
+    import { add, tags } from 'https://cdn.jsdelivr.net/gh/nanoflite/nanojs@latest/nanojs.mjs'
+    const { h1 } = tags()
+    add(document.body, h1('Hello World!'))
+</script>
+</body>
+</html>`}), 
   Footer()
 )
-  
-const Github = () => div(
+
+const Source = () => div(
   Header(),
-  a({href: 'https://github.com/nanoflite/nanojs'}, 'github'),
+  html(`<h2>CDN</h2>
+<pre><code>import { ... } from &#39;https://cdn.jsdelivr.net/gh/nanoflite/nanojs@latest/dist/nanojs.mjs&#39;
+</code></pre>
+<h2>Github</h2>
+<ul>
+<li><a href="https://github.com/nanoflite/nanojs">nanojs github repository</a></li>
+</ul>
+`),
   Footer()
 )
 
@@ -40,8 +86,7 @@ const Docs = () => {
   const examples = []
 	examples[0] = {}
 	examples[0]['id'] = 'helloworld'
-	examples[0]['js'] = `
-add(S('#helloworld'), div(p('Hello World!')))
+	examples[0]['js'] = `add(S('#helloworld'), div(p('Hello World!')))
 `
 	examples[0]['html'] = `<h2>Hello World</h2>
 <p>Checkout this <code>Hello World</code> example in <em>nJS</em>. </p>
@@ -49,8 +94,7 @@ add(S('#helloworld'), div(p('Hello World!')))
 	examples[0]['name'] = 'Helloworld'
 	examples[1] = {}
 	examples[1]['id'] = 'tags'
-	examples[1]['js'] = `
-add(S('#tags'), div(p('Hello World!'), ul(li('a'), li('b'), li('c'))))
+	examples[1]['js'] = `add(S('#tags'), div(p('Hello World!'), ul(li('a'), li('b'), li('c'))))
 `
 	examples[1]['html'] = `<h2>Tags</h2>
 <p>Tags can be imported from the <code>tags</code> function, whereby each tag is a function that takes a list of other tags or text.</p>
@@ -60,8 +104,7 @@ add(S('#tags'), div(p('Hello World!'), ul(li('a'), li('b'), li('c'))))
 	examples[1]['name'] = 'Tags'
 	examples[2] = {}
 	examples[2]['id'] = 'state'
-	examples[2]['js'] = `
-const counter = state(0)
+	examples[2]['js'] = `const counter = state(0)
 
 add(S('#state'), div(
     p("Counter: ", counter),
@@ -75,8 +118,7 @@ add(S('#state'), div(
 	examples[2]['name'] = 'State'
 	examples[3] = {}
 	examples[3]['id'] = 'derived'
-	examples[3]['js'] = `
-const counter = state(0)
+	examples[3]['js'] = `const counter = state(0)
 
 const square = derive(_ => counter.value * counter.value)
 
@@ -92,8 +134,7 @@ add(S('#derived'), div(
 	examples[3]['name'] = 'Derived'
 	examples[4] = {}
 	examples[4]['id'] = 'stateproperty'
-	examples[4]['js'] = `
-const counter = state(0)
+	examples[4]['js'] = `const counter = state(0)
 
 add(S('#stateproperty'), div(
     p("Counter: ", counter),
@@ -107,8 +148,7 @@ add(S('#stateproperty'), div(
 	examples[4]['name'] = 'Stateproperty'
 	examples[5] = {}
 	examples[5]['id'] = 'statederivedproperty'
-	examples[5]['js'] = `
-const counter = state(0)
+	examples[5]['js'] = `const counter = state(0)
 
 add(S('#statederivedproperty'), div(
     p("Counter: ", counter),
@@ -123,8 +163,7 @@ add(S('#statederivedproperty'), div(
 	examples[5]['name'] = 'Statederivedproperty'
 	examples[6] = {}
 	examples[6]['id'] = 'statederivedchild'
-	examples[6]['js'] = `
-const counter = state(0)
+	examples[6]['js'] = `const counter = state(0)
 const square = derive(_ => Math.pow(counter.value, 2))
 
 add(S('#statederivedchild'), div(
@@ -148,8 +187,7 @@ add(S('#statederivedchild'), div(
 	examples[7]['name'] = 'Change'
 	examples[8] = {}
 	examples[8]['id'] = 'watch'
-	examples[8]['js'] = `
-const counter = state(0)
+	examples[8]['js'] = `const counter = state(0)
 
 watch(() => {
     if (counter.value === 3) {
@@ -196,7 +234,7 @@ add(S('#watch'), div(
 router([
     ['#home', Home],
     ['#docs', Docs],
-    ['#github', Github]
+    ['#source', Source]
   ]
 )
 
