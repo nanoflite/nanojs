@@ -39,11 +39,11 @@ const Home = () => div(
 <head>
     <meta charset="UTF-8">
     <title>nJS example</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/nanoflite/nanojs@latest/nanojs.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/nanoflite/nanojs@1.0.0/dist/nano.css"/>
 </head>
 <body>
 <script type="module">
-    import { add, tags } from 'https://cdn.jsdelivr.net/gh/nanoflite/nanojs@latest/nanojs.mjs'
+    import { add, tags } from 'https://cdn.jsdelivr.net/gh/nanoflite/nanojs@1.0.0/dist/nanojs.mjs'
     const { h1 } = tags()
     add(document.body, h1('Hello World!'))
 </script>
@@ -54,11 +54,11 @@ const Home = () => div(
 <head>
     <meta charset="UTF-8">
     <title>nJS example</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/nanoflite/nanojs@latest/nanojs.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/nanoflite/nanojs@1.0.0/dist/nano.css"/>
 </head>
 <body>
 <script type="module">
-    import { add, tags } from 'https://cdn.jsdelivr.net/gh/nanoflite/nanojs@latest/nanojs.mjs'
+    import { add, tags } from 'https://cdn.jsdelivr.net/gh/nanoflite/nanojs@1.0.0/dist/nanojs.mjs'
     const { h1 } = tags()
     add(document.body, h1('Hello World!'))
 </script>
