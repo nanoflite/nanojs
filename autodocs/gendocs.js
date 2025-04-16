@@ -96,6 +96,7 @@ for (const snippet of snippets) {
   const js = fs.readFileSync(snippet, 'utf8')
   append_target(`\texamples[${i}] = {}\n`)
   append_target(`\texamples[${i}]['id'] = '${id}'\n`)
+  append_target(`\texamples[${i}]['hasjs'] = '${js ? `true`: `false`}'\n`)
   append_target(`\texamples[${i}]['js'] = \`${escape(js.split('\n').slice(4).join('\n'))}\`\n`)
   append_target(`\texamples[${i}]['html'] = \`${body}\`\n`)
   append_target(`\texamples[${i}]['name'] = '${name}'\n`)
@@ -105,13 +106,18 @@ for (const snippet of snippets) {
 append_target(`
   const output = []
   for (const example of examples) {
+    const example_elt = example['hasjs'] === 'true'
+      ? div(
+          h4('code'),
+          pre(code({class: 'language-javascript'}, example['js'])),
+          h4('result'),
+          div({id: example['id'], class: 'example'})
+        )
+      : ""  
     output.push(
       div(
         html(example['html']),
-        h4('code'),
-        pre(code({class: 'language-javascript'}, example['js'])),
-        h4('result'),
-        div({id: example['id'], class: 'example'})
+        example_elt
       )
     ) 
   }
