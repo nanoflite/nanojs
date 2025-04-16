@@ -70,7 +70,7 @@ const Home = () => div(
 const Source = () => div(
   Header(),
   html(`<h2>CDN</h2>
-<pre><code>import { ... } from &#39;https://cdn.jsdelivr.net/gh/nanoflite/nanojs@latest/dist/nanojs.mjs&#39;
+<pre><code>import { ... } from &#39;https://cdn.jsdelivr.net/gh/nanoflite/nanojs@1.0.0/dist/nanojs.mjs&#39;
 </code></pre>
 <h2>Github</h2>
 <ul>
@@ -86,6 +86,7 @@ const Docs = () => {
   const examples = []
 	examples[0] = {}
 	examples[0]['id'] = 'helloworld'
+	examples[0]['hasjs'] = 'true'
 	examples[0]['js'] = `add(S('#helloworld'), div(p('Hello World!')))
 `
 	examples[0]['html'] = `<h2>Hello World</h2>
@@ -94,6 +95,7 @@ const Docs = () => {
 	examples[0]['name'] = 'Helloworld'
 	examples[1] = {}
 	examples[1]['id'] = 'tags'
+	examples[1]['hasjs'] = 'true'
 	examples[1]['js'] = `add(S('#tags'), div(p('Hello World!'), ul(li('a'), li('b'), li('c'))))
 `
 	examples[1]['html'] = `<h2>Tags</h2>
@@ -104,6 +106,7 @@ const Docs = () => {
 	examples[1]['name'] = 'Tags'
 	examples[2] = {}
 	examples[2]['id'] = 'state'
+	examples[2]['hasjs'] = 'true'
 	examples[2]['js'] = `const counter = state(0)
 
 add(S('#state'), div(
@@ -118,6 +121,7 @@ add(S('#state'), div(
 	examples[2]['name'] = 'State'
 	examples[3] = {}
 	examples[3]['id'] = 'derived'
+	examples[3]['hasjs'] = 'true'
 	examples[3]['js'] = `const counter = state(0)
 
 const square = derive(_ => counter.value * counter.value)
@@ -134,6 +138,7 @@ add(S('#derived'), div(
 	examples[3]['name'] = 'Derived'
 	examples[4] = {}
 	examples[4]['id'] = 'stateproperty'
+	examples[4]['hasjs'] = 'true'
 	examples[4]['js'] = `const counter = state(0)
 
 add(S('#stateproperty'), div(
@@ -148,6 +153,7 @@ add(S('#stateproperty'), div(
 	examples[4]['name'] = 'Stateproperty'
 	examples[5] = {}
 	examples[5]['id'] = 'statederivedproperty'
+	examples[5]['hasjs'] = 'true'
 	examples[5]['js'] = `const counter = state(0)
 
 add(S('#statederivedproperty'), div(
@@ -163,6 +169,7 @@ add(S('#statederivedproperty'), div(
 	examples[5]['name'] = 'Statederivedproperty'
 	examples[6] = {}
 	examples[6]['id'] = 'statederivedchild'
+	examples[6]['hasjs'] = 'true'
 	examples[6]['js'] = `const counter = state(0)
 const square = derive(_ => Math.pow(counter.value, 2))
 
@@ -179,6 +186,7 @@ add(S('#statederivedchild'), div(
 	examples[6]['name'] = 'Statederivedchild'
 	examples[7] = {}
 	examples[7]['id'] = 'change'
+	examples[7]['hasjs'] = 'false'
 	examples[7]['js'] = ``
 	examples[7]['html'] = `<h2>Execute code when state changes</h2>
 <p>There are 3 ways to execute code when state changes: <code>watch</code>, <code>derive</code> and <code>change</code>.</p>
@@ -187,6 +195,7 @@ add(S('#statederivedchild'), div(
 	examples[7]['name'] = 'Change'
 	examples[8] = {}
 	examples[8]['id'] = 'watch'
+	examples[8]['hasjs'] = 'true'
 	examples[8]['js'] = `const counter = state(0)
 
 watch(() => {
@@ -213,13 +222,18 @@ add(S('#watch'), div(
 
   const output = []
   for (const example of examples) {
+    const example_elt = example['hasjs'] === 'true'
+      ? div(
+          h4('code'),
+          pre(code({class: 'language-javascript'}, example['js'])),
+          h4('result'),
+          div({id: example['id'], class: 'example'})
+        )
+      : ""  
     output.push(
       div(
         html(example['html']),
-        h4('code'),
-        pre(code({class: 'language-javascript'}, example['js'])),
-        h4('result'),
-        div({id: example['id'], class: 'example'})
+        example_elt
       )
     ) 
   }
