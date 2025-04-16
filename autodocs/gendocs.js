@@ -19,6 +19,8 @@ const append_target = (txt) => {
 
 const escape = (txt) => txt.replaceAll('`', '\\`').replaceAll('$', '\\$')
 
+const get_file= (filename) => fs.readFileSync(path.join(docs, filename), 'utf8')
+
 const get_md_as_html = (filename) => {
   const md = fs.readFileSync(path.join(docs, filename), 'utf8')
   const body = escape(marked.parse(md))
@@ -36,8 +38,10 @@ shell.cp('-r', path.join(root, 'nanojs'), build_folder)
 shell.cp(path.join(root, 'style', 'nano.css'), build_folder)
 shell.cp(path.join(__dirname, 'index.html'), build_folder)
 
+const example_html = get_file('example.html')
+
 append_target(`import { tags, add, html, state, states, watch, derive, change, until, sleep, schedule, css, S, router, model, component, style } from './nanojs/index.mjs'\n`)
-append_target(`const { span, a, hr, div, p, ul, li, h1, h2, h3, h4, pre, code, button, input, sup, script } = tags()\n`)
+append_target(`const { span, a, hr, div, p, ul, li, h1, h2, h3, h4, pre, code, button, input, sup, script, iframe } = tags()\n`)
 
 append_target(`
 const menu = [ '#home', '#docs', '#source' ]
@@ -54,16 +58,19 @@ const Header = () => div(
   Menu(menu)
 )
 
-const Footer = () => div(
-  html(\`${get_md_as_html('footer.md')}\`)
-)
+const Footer = () => {
+  setTimeout(_ => hljs.highlightAll(), 0)
+  return div(html(\`${get_md_as_html('footer.md')}\`))
+}
 
 const Home = () => div(
   Header(),
   html(\`${get_md_as_html('header.md')}\`),
+  pre(code(\`${escape(example_html)}\`)),
+  iframe({srcdoc: \`${escape(example_html)}\`}), 
   Footer()
 )
-  
+
 const Source = () => div(
   Header(),
   html(\`${get_md_as_html('source.md')}\`),

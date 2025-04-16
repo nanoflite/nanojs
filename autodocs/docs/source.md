@@ -1,7 +1,7 @@
 ## CDN
 
 ```
-import { ... } from 'https://cdn.jsdelivr.net/gh/nanoflite/nanojs@latest/nanojs.mjs'
+import { ... } from 'https://cdn.jsdelivr.net/gh/nanoflite/nanojs@latest/dist/nanojs.mjs'
 ```
 
 ## Github
