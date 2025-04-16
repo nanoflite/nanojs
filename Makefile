@@ -8,7 +8,7 @@ cdn:
 	npm run build
 	git checkout cdn
 	git pull
-	git add dist/nanojs.mjs
+	git add dist/nanojs.mjs dist/nano.css
 	git commit -m 'Update CDN build'
 	git push
 	git checkout main

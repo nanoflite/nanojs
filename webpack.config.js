@@ -1,4 +1,5 @@
-const path = require('path');
+const path = require('path')
+const CopyPlugin = require("copy-webpack-plugin")
 
 module.exports = {
     mode: 'production',
@@ -13,5 +14,12 @@ module.exports = {
     },
     experiments: {
         outputModule: true
-    }
+    },
+    plugins: [
+        new CopyPlugin({
+            patterns: [
+                { from: 'style/nano.css', to: 'dist/nano.css' }
+            ]
+        })
+    ]
 }
