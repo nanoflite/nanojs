@@ -276,4 +276,3 @@ router([
     ['#svg', Svg],
     ['#math', Math]
 ])
-
