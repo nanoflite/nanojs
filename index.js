@@ -1,7 +1,10 @@
 import { tags, add, html, state, states, watch, derive, change, until, sleep, schedule, css, S, router, model, component, style } from './nanojs/index.mjs'
 const { span, a, hr, div, p, ul, li, h1, h2, h3, h4, pre, code, button, input, sup, script, iframe } = tags()
+const { svg, circle } = tags('http://www.w3.org/2000/svg')
+const { math, mfrac, mi, mn, mo, mrow, msqrt, msup } = tags('http://www.w3.org/1998/Math/MathML')
 
-const menu = [ '#home', '#docs', '#source' ]
+
+const menu = [ '#home', '#demo', '#docs', '#source' ]
 
 const Menu = (menu) => {
     return div(
@@ -93,6 +96,7 @@ const Docs = () => {
 <p>Checkout this <code>Hello World</code> example in <em>nJS</em>. </p>
 `
 	examples[0]['name'] = 'Helloworld'
+	examples[0]['codeFirst'] = 'true'
 	examples[1] = {}
 	examples[1]['id'] = 'tags'
 	examples[1]['hasjs'] = 'true'
@@ -104,6 +108,7 @@ const Docs = () => {
 <p>The <code>add</code> function can be used to add a list of (nested) children to a DOM element (e.g. <code>document.body</code>).</p>
 `
 	examples[1]['name'] = 'Tags'
+	examples[1]['codeFirst'] = 'true'
 	examples[2] = {}
 	examples[2]['id'] = 'state'
 	examples[2]['hasjs'] = 'true'
@@ -119,6 +124,7 @@ add(S('#state'), div(
 <p>You can access the value of state by using the <code>value</code> property.</p>
 `
 	examples[2]['name'] = 'State'
+	examples[2]['codeFirst'] = 'true'
 	examples[3] = {}
 	examples[3]['id'] = 'derived'
 	examples[3]['hasjs'] = 'true'
@@ -136,6 +142,7 @@ add(S('#derived'), div(
 <p>State can be derived from another state variable, using the <code>derive</code> function.</p>
 `
 	examples[3]['name'] = 'Derived'
+	examples[3]['codeFirst'] = 'true'
 	examples[4] = {}
 	examples[4]['id'] = 'stateproperty'
 	examples[4]['hasjs'] = 'true'
@@ -151,6 +158,7 @@ add(S('#stateproperty'), div(
 <p>You can set the value of a property to a state variable.</p>
 `
 	examples[4]['name'] = 'Stateproperty'
+	examples[4]['codeFirst'] = 'true'
 	examples[5] = {}
 	examples[5]['id'] = 'statederivedproperty'
 	examples[5]['hasjs'] = 'true'
@@ -167,6 +175,7 @@ add(S('#statederivedproperty'), div(
 <p>If we set the value of a property to be a function, we can use derived state as the value of that property.</p>
 `
 	examples[5]['name'] = 'Statederivedproperty'
+	examples[5]['codeFirst'] = 'true'
 	examples[6] = {}
 	examples[6]['id'] = 'statederivedchild'
 	examples[6]['hasjs'] = 'true'
@@ -184,6 +193,7 @@ add(S('#statederivedchild'), div(
 <p>A child node can be a derived state variable. Alternatively, we can use a function as a child node.</p>
 `
 	examples[6]['name'] = 'Statederivedchild'
+	examples[6]['codeFirst'] = 'true'
 	examples[7] = {}
 	examples[7]['id'] = 'change'
 	examples[7]['hasjs'] = 'false'
@@ -193,6 +203,7 @@ add(S('#statederivedchild'), div(
 <p>We already discussed <code>derive</code>, which return a new state that depends on another state.</p>
 `
 	examples[7]['name'] = 'Change'
+	examples[7]['codeFirst'] = 'true'
 	examples[8] = {}
 	examples[8]['id'] = 'watch'
 	examples[8]['hasjs'] = 'true'
@@ -219,16 +230,156 @@ add(S('#watch'), div(
 <p>The <code>setTimeout</code> in the alert watcher is necessary to let the UI update before the alert is shown.</p>
 `
 	examples[8]['name'] = 'Watch'
+	examples[8]['codeFirst'] = 'true'
 
   const output = []
   for (const example of examples) {
     const example_elt = example['hasjs'] === 'true'
-      ? div(
-          h4('code'),
-          pre(code({class: 'language-javascript'}, example['js'])),
-          h4('result'),
-          div({id: example['id'], class: 'example'})
+      ? example['codeFirst'] === 'true'
+          ? div(
+              h4('code'),
+              pre(code({class: 'language-javascript'}, example['js'])),
+              h4('result'),
+              div({id: example['id'], class: 'example'})
+            )
+          : div(
+              h4('demo'),
+              div({id: example['id'], class: 'example'}),
+              h4('code'),
+              pre(code({class: 'language-javascript'}, example['js']))
+            )   
+      : ""  
+    output.push(
+      div(
+        html(example['html']),
+        example_elt
+      )
+    ) 
+  }
+  setTimeout(() => {
+    for (const example of examples) {
+      eval(example['js'])
+    }
+  })
+  return div(Header(), ...output, Footer())
+}
+
+
+const Demo = () => {
+  const examples = []
+	examples[0] = {}
+	examples[0]['id'] = 'whackamole'
+	examples[0]['hasjs'] = 'true'
+	examples[0]['js'] = `const gamestate = states()
+const { score, timer, showscore, moles, running, lastwacked, high } =
+    gamestate(0, 15, false, new Array(9).fill(false), false, -1, localStorage.getItem('high') || 0)
+
+watch( _ => { if (score.value > high.value) high.value = score.value, localStorage.setItem('high', high.value) })
+
+const mole = (i) =>
+    div({ class: 'mole',
+        onclick: _ => {
+            if (running.value && lastwacked.value !== i && moles.value[i]) score.value++
+            lastwacked.value = i
+        }
+    }, _ => moles.value[i] ? \`🐹\` : \` \`)
+
+const nextRandomMole = _ => {
+    const i = Math.floor(Math.random() * moles.value.length)
+    return moles.value[i] ? nextRandomMole() : i
+}
+
+const clearMoles = _ => moles.value = moles.value.map(_ => false)
+
+const play = async () => {
+    running.value = true
+    while (--timer.value > 0) {
+        const theMole = nextRandomMole()
+        clearMoles()
+        await sleep(200+Math.floor(Math.random()*600))
+        moles.value = moles.value.map((_, i) => i === theMole)
+        await sleep(400+Math.floor(Math.random()*400))
+    }
+    clearMoles()
+    showscore.value = true
+    await change(showscore)
+    gamestate.reset()
+}
+
+add(S('#whackamole'), () => div({ class: 'container' },
+    div({ class: 'game' },
+        h1('Whack-A-Mole'),
+        div({ class: 'game-info'},
+            span(_ => \`Time: \${timer.value}s\`),
+            span(_ => \`Score: \${score.value}\`),
+            span(_ => \`High: \${high.value}\`)
+        ),
+        div({class: 'grid'}, moles.value.map((_, i) => mole(i))),
+        button({ style: _ => running.value || showscore.value ? \`background: #aaa\` : \`background: #007bff;\`,
+                 onclick: _ => running.value || play()
+               }, 'Start'),
+        div({ class: 'scoreboard', style: () => \`display: \${showscore.value ? "block" : "none"};\`},
+            h1('Game Over!'),
+            div(_ => \`Score: \${score.value}\`),
+            button({ onclick: _ => showscore.value = false }, 'OK')
         )
+    ),
+    div({ class: 'footer' }, \`(c) 2025 JVdB - powered by nanojs\`)
+))`
+	examples[0]['html'] = `<h2>Whack A Mole</h2>
+<p>Smash the moles before the timer expires</p>
+`
+	examples[0]['name'] = 'Whackamole'
+	examples[0]['codeFirst'] = 'false'
+	examples[1] = {}
+	examples[1]['id'] = 'example'
+	examples[1]['hasjs'] = 'true'
+	examples[1]['js'] = `const counter = state(0)
+const square = derive(_ => counter.value * counter.value)
+
+const Example = () => div(
+    div(
+        h2('state'),
+        div("counter: ", counter),
+        h2('derived state'),
+        div("square:", counter, sup(2),'=', square),
+        h2('property'),
+        input({type: "number", value: _ => counter.value, disabled: true}),
+        h2('state-derived property'),
+        div({style: () => \`font-size: \${8 + counter.value}px;\`}, "Hello"),
+        h2('state-derived child'),
+        div(counter, sup(2), () => \` = \${square.value}\`),
+        hr(),
+        button({ onclick: () => counter.value++ }, 'inc'),
+        button({ onclick: () => counter.value-- }, 'dec'),
+        button({ onclick: () => counter.value = 0 }, 'reset')
+    )
+)
+
+add(S('#example'), Example())
+`
+	examples[1]['html'] = `<h2>Example</h2>
+<p>A concise example of a few key features.</p>
+`
+	examples[1]['name'] = 'Example'
+	examples[1]['codeFirst'] = 'false'
+
+  const output = []
+  for (const example of examples) {
+    const example_elt = example['hasjs'] === 'true'
+      ? example['codeFirst'] === 'true'
+          ? div(
+              h4('code'),
+              pre(code({class: 'language-javascript'}, example['js'])),
+              h4('result'),
+              div({id: example['id'], class: 'example'})
+            )
+          : div(
+              h4('demo'),
+              div({id: example['id'], class: 'example'}),
+              h4('code'),
+              pre(code({class: 'language-javascript'}, example['js']))
+            )   
       : ""  
     output.push(
       div(
@@ -247,9 +398,9 @@ add(S('#watch'), div(
 
 router([
     ['#home', Home],
+    ['#demo', Demo],
     ['#docs', Docs],
     ['#source', Source]
   ]
 )
-
 
